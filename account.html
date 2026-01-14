@@ -1,1 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account - my GLO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Prompt', 'Sarabun', Arial, sans-serif;
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            min-height: 100vh;
+            padding: 20px 20px 100px 20px;
+        }
+
+        /* ===== LOADER STYLES ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .lottery-drum {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .drum-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            animation: drumRotate 3s ease-in-out infinite;
+        }
+
+        .drum-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 20px solid #0d8dd9;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 
+                inset 0 0 30px rgba(30, 91, 184, 0.2),
+                0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px;
+            height: 20px;
+            background: linear-gradient(90deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: #1e5bb8;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-stand {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 30px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .drum-stand::before,
+        .drum-stand::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+        }
+
+        .drum-stand::before {
+            left: 30px;
+        }
+
+        .drum-stand::after {
+            right: 30px;
+        }
+
+        .balls-container {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: ballsRotate 2s linear infinite;
+        }
+
+        .lottery-ball {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 50%, #ffa5a5 100%);
+            border: 3px solid #c92a2a;
+            box-shadow: 
+                inset -5px -5px 10px rgba(0, 0, 0, 0.2),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.5),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: ballBounce 1s ease-in-out infinite;
+        }
+
+        .lottery-ball:nth-child(1) {
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+
+        .lottery-ball:nth-child(2) {
+            top: 25%;
+            right: 15%;
+            animation-delay: 0.2s;
+        }
+
+        .lottery-ball:nth-child(3) {
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            animation-delay: 0.4s;
+        }
+
+        .lottery-ball:nth-child(4) {
+            bottom: 25%;
+            right: 15%;
+            animation-delay: 0.6s;
+        }
+
+        .lottery-ball:nth-child(5) {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0.8s;
+        }
+
+        .lottery-ball:nth-child(6) {
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 1s;
+        }
+
+        .lottery-ball:nth-child(7) {
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+            animation-delay: 1.2s;
+        }
+
+        .lottery-ball:nth-child(8) {
+            top: 25%;
+            left: 15%;
+            animation-delay: 1.4s;
+        }
+
+        .lottery-ball:nth-child(9) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: centerBallPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text {
+            margin-top: 80px;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text-sub {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            text-align: center;
+        }
+
+        @keyframes drumRotate {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        @keyframes ballsRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes ballBounce {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.1) translateY(-5px); }
+        }
+
+        @keyframes centerBallPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        #main-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .page-hidden {
+            display: none;
+        }
+
+        .page-visible {
+            display: block;
+        }
+
+        /* Login/Signup Choice */
+        .auth-card {
+            background: white;
+            border-radius: 25px;
+            padding: 50px 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+            max-width: 500px;
+            margin: 50px auto;
+        }
+
+        .auth-logo {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 15px rgba(30, 91, 184, 0.2);
+            padding: 10px;
+        }
+
+        .auth-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .auth-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1e5bb8;
+            margin-bottom: 40px;
+        }
+
+        .auth-button {
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Prompt', sans-serif;
+            margin-bottom: 20px;
+        }
+
+        .auth-button.primary {
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            color: white;
+        }
+
+        .auth-button.secondary {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a2744;
+        }
+
+        .auth-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #1e5bb8;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1e5bb8;
+            box-shadow: 0 0 10px rgba(30, 91, 184, 0.2);
+        }
+
+        /* Signup Success Message */
+        .success-message {
+            background: #fff9e6;
+            border: 2px solid #ffd700;
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+
+        .success-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1e5bb8;
+            margin-bottom: 20px;
+        }
+
+        .success-text {
+            color: #666;
+            font-size: 18px;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .whatsapp-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .whatsapp-link:hover {
+            background: #20ba5a;
+            transform: scale(1.05);
+        }
+
+        /* Invoice Display */
+        .invoice-container {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            border-radius: 25px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            margin-bottom: 30px;
+        }
+
+        .invoice-header {
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            padding: 40px 30px;
+            color: white;
+        }
+
+        .invoice-header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 30px;
+        }
+
+        .invoice-logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .invoice-logo {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .invoice-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .invoice-company-info {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .invoice-company-name {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .invoice-date-section {
+            text-align: right;
+        }
+
+        .invoice-date-title {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .invoice-body {
+            background: white;
+            padding: 40px 30px;
+        }
+
+        .bill-to-section {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 30px;
+        }
+
+        .bill-to {
+            flex: 1;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1e5bb8;
+            margin-bottom: 15px;
+        }
+
+        .customer-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .customer-detail {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 5px;
+        }
+
+        .invoice-meta {
+            text-align: right;
+        }
+
+        .meta-item {
+            margin-bottom: 8px;
+            font-size: 15px;
+        }
+
+        .meta-label {
+            font-weight: 700;
+            color: #333;
+        }
+
+        .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .invoice-table thead {
+            background: #ffd700;
+        }
+
+        .invoice-table th {
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 700;
+            color: #1a2744;
+            font-size: 15px;
+        }
+
+        .invoice-table td {
+            padding: 20px 10px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .item-description {
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .status-success {
+            color: #4CAF50;
+        }
+
+        .status-error {
+            color: #f44336;
+        }
+
+        .invoice-totals {
+            text-align: right;
+            max-width: 500px;
+            margin-left: auto;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 20px;
+            font-size: 16px;
+        }
+
+        .total-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .total-value {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .total-final {
+            background: #ffd700;
+            font-size: 20px;
+            font-weight: 700;
+            padding: 18px 20px;
+            margin-top: 10px;
+            border-radius: 10px;
+        }
+
+        .payment-info {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #e0e0e0;
+        }
+
+        .terms-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+
+        .terms-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e5bb8;
+            margin-bottom: 15px;
+        }
+
+        .terms-text {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.8;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+            padding: 10px 0;
+            z-index: 1000;
+        }
+
+        .nav-container {
+            max-width: 680px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 12px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .nav-item:hover {
+            background: #f5f5f5;
+        }
+
+        .nav-item.active {
+            color: #1e5bb8;
+        }
+
+        .nav-item:not(.active) {
+            color: #999;
+        }
+
+        .nav-icon {
+            width: 28px;
+            height: 28px;
+        }
+
+        .nav-label {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .auth-card {
+                padding: 40px 25px;
+            }
+
+            .invoice-header-content {
+                flex-direction: column;
+            }
+
+            .invoice-date-section {
+                text-align: left;
+            }
+
+            .bill-to-section {
+                flex-direction: column;
+            }
+
+            .invoice-meta {
+                text-align: left;
+            }
+
+            .invoice-table {
+                font-size: 13px;
+            }
+
+            .invoice-table th,
+            .invoice-table td {
+                padding: 10px 5px;
+            }
+
+            .total-final {
+                font-size: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="lottery-drum">
+            <div class="drum-container">
+                <div class="drum-ring"></div>
+                <div class="drum-handle"></div>
+                <div class="balls-container">
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                </div>
+            </div>
+            <div class="drum-stand"></div>
+        </div>
+        <div class="loading-text">กำลังโหลด...</div>
+        <div class="loading-text-sub">Account</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        <div class="container">
+            <!-- Choice Page -->
+            <div id="choicePage" class="page-visible">
+                <div class="auth-card">
+                    <div class="auth-logo">
+                        <img src="images/logo.png" alt="GLO Logo">
+                    </div>
+                    <h1 class="auth-title">My Account</h1>
+                    <button class="auth-button primary" onclick="showLogin()">Login</button>
+                    <button class="auth-button secondary" onclick="showSignup()">Sign Up</button>
+                </div>
+            </div>
+
+            <!-- Login Page -->
+            <div id="loginPage" class="page-hidden">
+                <div class="auth-card">
+                    <h1 class="auth-title">Login</h1>
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label class="form-label">Customer ID</label>
+                            <input type="text" class="form-input" id="customerId" placeholder="Enter Customer ID" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="password" placeholder="Enter Password" required>
+                        </div>
+                        <button type="submit" class="auth-button primary">Login</button>
+                        <div id="loginError" style="color: #f44336; margin-top: 15px; display: none;"></div>
+                    </form>
+                    <a class="back-link" onclick="showChoice()">← Back</a>
+                    
+                    <div style="margin-top: 30px; padding: 20px; background: #f0f7ff; border-radius: 12px; font-size: 14px; color: #1e5bb8;">
+                        <strong>Demo Account:</strong><br>
+                        Customer ID: <strong>CUST001</strong><br>
+                        Password: <strong>demo123</strong>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Signup Page -->
+            <div id="signupPage" class="page-hidden">
+                <div class="auth-card">
+                    <h1 class="auth-title">Sign Up</h1>
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" placeholder="Enter your full name" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Mobile Number</label>
+                            <input type="tel" class="form-input" placeholder="+1234567890" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Country</label>
+                            <input type="text" class="form-input" placeholder="Enter your country" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" placeholder="Create a password" required>
+                        </div>
+                        <button type="submit" class="auth-button secondary">Submit Registration</button>
+                    </form>
+                    <a class="back-link" onclick="showChoice()">← Back</a>
+                </div>
+            </div>
+
+            <!-- Signup Success Page -->
+            <div id="signupSuccessPage" class="page-hidden">
+                <div class="auth-card">
+                    <div class="success-message">
+                        <div class="success-icon">⚠️</div>
+                        <h2 class="success-title">Registration Submitted</h2>
+                        <p class="success-text">
+                            <strong>You are not a registered customer.</strong><br><br>
+                            Contact our WhatsApp number for registration:
+                        </p>
+                        <a href="https://wa.me/447441343629?text=Hello,%20I%20want%20to%20register%20for%20GLO%20lottery" 
+                           class="whatsapp-link" target="_blank">
+                            <span>📱</span>
+                            <span>+44 7441 343629</span>
+                        </a>
+                        <div style="margin-top: 30px;">
+                            <a class="back-link" onclick="showChoice()">← Back to Login</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Invoice Page (After Login) -->
+            <div id="invoicePage" class="page-hidden">
+                <div class="invoice-container">
+                    <!-- Invoice Header -->
+                    <div class="invoice-header">
+                        <div class="invoice-header-content">
+                            <div class="invoice-logo-section">
+                                <div class="invoice-logo">
+                                    <img src="images/logo.png" alt="GLO Logo">
+                                </div>
+                                <div class="invoice-company-info">
+                                    <div class="invoice-company-name">Government Lottery Office</div>
+                                    <div>Nonthaburi, Bangkok, Thailand</div>
+                                    <div>Agency- LUCY LIU - Pattaya city</div>
+                                    <div>447441343629</div>
+                                    <div>glo@yahoo.com</div>
+                                    <div>www.glo.or.th</div>
+                                </div>
+                            </div>
+                            <div class="invoice-date-section">
+                                <div class="invoice-date-title">THAILAND LOTTERY</div>
+                                <div>REGISTRATION</div>
+                                <div style="font-size: 18px; margin-top: 10px;">16-12-2025</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Body -->
+                    <div class="invoice-body">
+                        <div class="bill-to-section">
+                            <div class="bill-to">
+                                <div class="section-title">BILL TO</div>
+                                <div class="customer-name">BAVAJAN SHAIK SHAIK SABJAN</div>
+                                <div class="customer-detail">Qatar</div>
+                                <div class="customer-detail">+974 3081 7292</div>
+                                <div class="customer-detail">VAT324448: 7CG54455</div>
+                            </div>
+                            <div class="invoice-meta">
+                                <div class="meta-item">
+                                    <span class="meta-label">INVOICE #</span> TH532458
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">DATE</span> 05/11/2025
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">DUE DATE</span> 14/12/2025
+                                </div>
+                                <div class="meta-item">
+                                    <span class="meta-label">P.O. #</span> 65247855
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Invoice Table -->
+                        <table class="invoice-table">
+                            <thead>
+                                <tr>
+                                    <th>Description</th>
+                                    <th style="text-align: center;">QTY</th>
+                                    <th style="text-align: right;">Price</th>
+                                    <th style="text-align: right;">Discount</th>
+                                    <th style="text-align: right;">Tax</th>
+                                    <th style="text-align: right;">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="item-description">Thailand Lottery 3UP</div>
+                                        <div class="status-badge status-success">
+                                            👍👍 payment of Rs.2,53,000 has been successfully completed 👍👍
+                                        </div>
+                                        <div class="status-badge status-error">
+                                            ❌❌ REGISTRATION FAILED
+                                        </div>
+                                        <div style="font-size: 13px; color: #666; margin-top: 5px;">
+                                            REASON: DISCOUNT IS NOT APPLIED
+                                        </div>
+                                    </td>
+                                    <td style="text-align: center;">1 3up<br>SET</td>
+                                    <td style="text-align: right;">₹1,050,000</td>
+                                    <td style="text-align: right;">30%</td>
+                                    <td style="text-align: right;">14%</td>
+                                    <td style="text-align: right;">₹1,316,700</td>
+                                </tr>
+                                <tr>
+                                    <td class="item-description">CHEQUE BOUNCE CHARGES</td>
+                                    <td style="text-align: center;">1</td>
+                                    <td style="text-align: right;">₹100,000</td>
+                                    <td style="text-align: right;">--</td>
+                                    <td style="text-align: right;">--</td>
+                                    <td style="text-align: right;">₹100,000</td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                        <!-- Totals -->
+                        <div class="invoice-totals">
+                            <div class="total-row">
+                                <div class="total-label">Subtotal</div>
+                                <div class="total-value">₹1,416,700.00</div>
+                            </div>
+                            <div class="total-row">
+                                <div class="total-label">Discount (21.7%)</div>
+                                <div class="total-value" style="color: #f44336;">-₹307,423.90</div>
+                            </div>
+                            <div class="total-row">
+                                <div class="total-label">Foreign exchange tax (28%)</div>
+                                <div class="total-value">₹310,597.30</div>
+                            </div>
+                            <div class="total-row total-final">
+                                <div class="total-label">TOTAL</div>
+                                <div class="total-value">₹1,419,873.40</div>
+                            </div>
+                            <div style="text-align: right; padding: 10px 20px; font-size: 14px; color: #666;">
+                                *Partially Paid ₹1,316,700.00
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="payment-info">
+                            <div class="section-title">Payment Method</div>
+                            <div style="color: #666; font-size: 16px;">online</div>
+                        </div>
+
+                        <!-- Terms & Conditions -->
+                        <div class="terms-section">
+                            <div class="terms-title">Terms & Conditions</div>
+                            <div class="terms-text">
+                                #100% Money back guarantee if not win<br>
+                                #100% Direct 1 set game #100% Refund if not win
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Logout Button -->
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="auth-button primary" onclick="logout()" style="max-width: 300px;">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-item">
+                <svg class="nav-icon" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                </svg>
+                <span class="nav-label">หน้าหลัก</span>
+            </a>
+
+            <a href="buy-ticket.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" stroke-width="2"/>
+                </svg>
+                <span class="nav-label">Buy Ticket</span>
+            </a>
+
+            <a href="open-ticket.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-width="2"/>
+                </svg>
+                <span class="nav-label">Open Ticket</span>
+            </a>
+
+            <a href="account.html" class="nav-item active">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-width="2"/>
+                </svg>
+                <span class="nav-label">Account</span>
+            </a>
+
+            <a href="contact.html" class="nav-item">
+                <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-width="2"/>
+                </svg>
+                <span class="nav-label">Contact</span>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Demo customer data
+        const DEMO_CUSTOMER = {
+            id: 'CUST001',
+            password: 'demo123'
+        };
+
+        // Show loader, then show main content
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('main-content').classList.add('visible');
+            }, 2000);
+        });
+
+        // Page navigation functions
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('[id$="Page"]').forEach(page => {
+                page.classList.remove('page-visible');
+                page.classList.add('page-hidden');
+            });
+            
+            // Show selected page
+            document.getElementById(pageId).classList.remove('page-hidden');
+            document.getElementById(pageId).classList.add('page-visible');
+        }
+
+        function showChoice() {
+            showPage('choicePage');
+        }
+
+        function showLogin() {
+            showPage('loginPage');
+        }
+
+        function showSignup() {
+            showPage('signupPage');
+        }
+
+        function logout() {
+            showPage('choicePage');
+        }
+
+        // Login form handler
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const customerId = document.getElementById('customerId').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const errorDiv = document.getElementById('loginError');
+            
+            if (customerId === DEMO_CUSTOMER.id && password === DEMO_CUSTOMER.password) {
+                // Login successful
+                errorDiv.style.display = 'none';
+                showPage('invoicePage');
+            } else {
+                // Login failed
+                errorDiv.textContent = 'Invalid Customer ID or Password';
+                errorDiv.style.display = 'block';
+            }
+        });
+
+        // Signup form handler
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            showPage('signupSuccessPage');
+        });
+    </script>
+</body>
+</html>
