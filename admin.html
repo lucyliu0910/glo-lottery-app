@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - GLO Lottery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .admin-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .admin-header {
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .admin-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .admin-header p {
+            opacity: 0.9;
+            font-size: 16px;
+        }
+
+        .logout-btn {
+            float: right;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            overflow-x: auto;
+        }
+
+        .tab {
+            padding: 15px 30px;
+            background: rgba(255,255,255,0.1);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            background: rgba(255,255,255,0.2);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .card h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ffd700;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ffd700;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            font-size: 16px;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a1a2e;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-danger {
+            background: #ff4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #cc0000;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        th {
+            background: rgba(255,215,0,0.2);
+            color: #ffd700;
+            font-weight: 700;
+        }
+
+        tr:hover {
+            background: rgba(255,255,255,0.05);
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffc107;
+        }
+
+        .status-active {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .alert-success {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #81C784;
+        }
+
+        .alert-error {
+            background: rgba(244, 67, 54, 0.2);
+            border: 1px solid #f44336;
+            color: #ef5350;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs {
+                flex-wrap: wrap;
+            }
+
+            .admin-header h1 {
+                font-size: 24px;
+            }
+
+            .logout-btn {
+                float: none;
+                display: block;
+                width: 100%;
+                margin-top: 15px;
+            }
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 25px;
+            padding: 50px 40px;
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .login-card h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: #ffd700;
+            font-size: 32px;
+        }
+
+        #mainContent {
+            display: none;
+        }
+
+        #mainContent.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-container">
+        <div class="login-card">
+            <h1>🔐 Admin Login</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label class="form-label">Admin Username</label>
+                    <input type="text" id="adminUsername" class="form-input" placeholder="Enter username" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Admin Password</label>
+                    <input type="password" id="adminPassword" class="form-input" placeholder="Enter password" required>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Login to Admin Panel</button>
+                <div id="loginError" class="alert alert-error" style="display: none; margin-top: 20px;"></div>
+                <div style="margin-top: 20px; text-align: center; font-size: 14px; opacity: 0.8;">
+                    Default: <strong>admin</strong> / <strong>admin123</strong>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Admin Panel -->
+    <div id="mainContent">
+        <div class="admin-container">
+            <!-- Header -->
+            <div class="admin-header">
+                <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+                <h1>🎰 GLO Lottery Admin Panel</h1>
+                <p>Manage customers, invoices, and lottery results</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('signups')">📋 New Signups</button>
+                <button class="tab" onclick="showTab('customers')">👥 Manage Customers</button>
+                <button class="tab" onclick="showTab('invoices')">💰 Create Invoice</button>
+                <button class="tab" onclick="showTab('lottery')">🎫 Update Lottery Results</button>
+                <button class="tab" onclick="showTab('settings')">⚙️ Settings</button>
+            </div>
+
+            <!-- Tab: New Signups -->
+            <div id="signupsTab" class="tab-content active">
+                <div class="card">
+                    <h2>📋 New Customer Signups</h2>
+                    <p style="margin-bottom: 20px; opacity: 0.8;">These customers have signed up but are not yet registered</p>
+                    <div id="signupsList">
+                        <div class="alert alert-success">
+                            ✓ Connected to Firebase! Waiting for signups...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Manage Customers -->
+            <div id="customersTab" class="tab-content">
+                <div class="card">
+                    <h2>👥 Create New Customer Account</h2>
+                    <form id="createCustomerForm">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Customer ID</label>
+                                <input type="text" id="newCustomerId" class="form-input" placeholder="e.g., CUST001" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="text" id="newCustomerPassword" class="form-input" placeholder="Create password" required>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" id="newCustomerName" class="form-input" placeholder="Customer name" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Country</label>
+                                <input type="text" id="newCustomerCountry" class="form-input" placeholder="Country" required>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Mobile Number</label>
+                                <input type="tel" id="newCustomerMobile" class="form-input" placeholder="+1234567890" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">VAT Number</label>
+                                <input type="text" id="newCustomerVAT" class="form-input" placeholder="VAT number">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">✓ Create Customer Account</button>
+                    </form>
+                    <div id="createCustomerMessage"></div>
+                </div>
+
+                <div class="card">
+                    <h2>👥 All Registered Customers</h2>
+                    <div class="table-container" id="customersList">
+                        <p style="opacity: 0.8;">Loading customers...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Create Invoice -->
+            <div id="invoicesTab" class="tab-content">
+                <div class="card">
+                    <h2>💰 Create/Update Customer Invoice</h2>
+                    <form id="invoiceForm">
+                        <div class="form-group">
+                            <label class="form-label">Select Customer</label>
+                            <select id="invoiceCustomerId" class="form-select" required>
+                                <option value="">-- Select Customer --</option>
+                            </select>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label class="form-label">Invoice Number</label>
+                                <input type="text" id="invoiceNumber" class="form-input" placeholder="TH532458" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Date</label>
+                                <input type="date" id="invoiceDate" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Due Date</label>
+                                <input type="date" id="invoiceDueDate" class="form-input" required>
+                            </div>
+                        </div>
+
+                        <h3 style="color: #ffd700; margin: 30px 0 20px 0;">Product Details</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Product Name</label>
+                                <input type="text" id="productName" class="form-input" value="Thailand Lottery 3UP" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Quantity</label>
+                                <input type="text" id="productQty" class="form-input" value="1 3up SET" required>
+                            </div>
+                        </div>
+
+                        <div class="grid-3">
+                            <div class="form-group">
+                                <label class="form-label">Price (₹)</label>
+                                <input type="number" id="productPrice" class="form-input" value="1050000" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Discount (%)</label>
+                                <input type="number" id="productDiscount" class="form-input" value="30" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tax (%)</label>
+                                <input type="number" id="productTax" class="form-input" value="14" required>
+                            </div>
+                        </div>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Cheque Bounce Charges (₹)</label>
+                                <input type="number" id="chequeCharge" class="form-input" value="100000" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Foreign Exchange Tax (%)</label>
+                                <input type="number" id="foreignTaxPercent" class="form-input" value="28" required>
+                            </div>
+                        </div>
+
+                        <h3 style="color: #ffd700; margin: 30px 0 20px 0;">Payment Status</h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Payment Status</label>
+                                <select id="paymentStatus" class="form-select" required>
+                                    <option value="Partially Paid">Partially Paid</option>
+                                    <option value="Paid">Paid</option>
+                                    <option value="Unpaid">Unpaid</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Amount Paid (₹)</label>
+                                <input type="number" id="amountPaid" class="form-input" value="1316700" required>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">✓ Save Invoice</button>
+                    </form>
+                    <div id="invoiceMessage"></div>
+                </div>
+            </div>
+
+            <!-- Tab: Lottery Results -->
+            <div id="lotteryTab" class="tab-content">
+                <div class="card">
+                    <h2>🎫 Update Lottery Results</h2>
+                    <form id="lotteryForm">
+                        <div class="form-group">
+                            <label class="form-label">Draw Date</label>
+                            <input type="text" id="lotteryDate" class="form-input" value="16 ธันวาคม 2568" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">First Prize (6 digits)</label>
+                            <input type="text" id="firstPrize" class="form-input" value="461252" maxlength="6" required>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label class="form-label">3 Digit Front (comma separated)</label>
+                                <input type="text" id="threeDigitFront" class="form-input" value="389,655" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">3 Digit Back (comma separated)</label>
+                                <input type="text" id="threeDigitBack" class="form-input" value="137,995" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">2 Digit</label>
+                            <input type="text" id="twoDigit" class="form-input" value="22" maxlength="2" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">✓ Update Results</button>
+                    </form>
+                    <div id="lotteryMessage"></div>
+                </div>
+            </div>
+
+            <!-- Tab: Settings -->
+            <div id="settingsTab" class="tab-content">
+                <div class="card">
+                    <h2>⚙️ App Settings</h2>
+                    <form id="settingsForm">
+                        <div class="form-group">
+                            <label class="form-label">Open Ticket Password</label>
+                            <input type="text" id="ticketPassword" class="form-input" value="ARSB3984" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">WhatsApp Number</label>
+                            <input type="tel" id="whatsappNumber" class="form-input" value="+447441343629" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Contact Email</label>
+                            <input type="email" id="contactEmail" class="form-input" value="governmentlotteryoffice@gmail.com" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">✓ Save Settings</button>
+                    </form>
+                    <div id="settingsMessage"></div>
+                </div>
+
+                <div class="card">
+                    <h2>🔐 Change Admin Password</h2>
+                    <form id="changePasswordForm">
+                        <div class="form-group">
+                            <label class="form-label">New Admin Password</label>
+                            <input type="password" id="newAdminPassword" class="form-input" placeholder="Enter new password" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">✓ Update Password</button>
+                    </form>
+                    <div id="passwordMessage"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_PROJECT.firebaseapp.com",
+            databaseURL: "https://YOUR_PROJECT.firebaseio.com",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_PROJECT.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Admin Login
+        const ADMIN_USERNAME = "admin";
+        const ADMIN_PASSWORD = "admin123";
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('mainContent').classList.add('show');
+                loadDashboard();
+            } else {
+                document.getElementById('loginError').textContent = '❌ Invalid credentials';
+                document.getElementById('loginError').style.display = 'block';
+            }
+        });
+
+        function logout() {
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('mainContent').classList.remove('show');
+        }
+
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName + 'Tab').classList.add('active');
+        }
+
+        function loadDashboard() {
+            loadSignups();
+            loadCustomers();
+            loadCustomerDropdown();
+        }
+
+        // Load Signups
+        function loadSignups() {
+            database.ref('signups').on('value', (snapshot) => {
+                const signups = snapshot.val();
+                const signupsList = document.getElementById('signupsList');
+                
+                if (!signups) {
+                    signupsList.innerHTML = '<div class="alert alert-success">✓ No new signups at the moment</div>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>Name</th><th>Mobile</th><th>Country</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+                
+                Object.keys(signups).forEach(key => {
+                    const signup = signups[key];
+                    html += `
+                        <tr>
+                            <td>${signup.name}</td>
+                            <td>${signup.mobile}</td>
+                            <td>${signup.country}</td>
+                            <td>${new Date(signup.timestamp).toLocaleDateString()}</td>
+                            <td><button class="btn btn-primary" onclick="approveSignup('${key}', '${signup.name}', '${signup.mobile}', '${signup.country}')">Approve</button></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                signupsList.innerHTML = html;
+            });
+        }
+
+        // Load Customers
+        function loadCustomers() {
+            database.ref('customers').on('value', (snapshot) => {
+                const customers = snapshot.val();
+                const customersList = document.getElementById('customersList');
+                
+                if (!customers) {
+                    customersList.innerHTML = '<p style="opacity: 0.8;">No customers yet</p>';
+                    return;
+                }
+
+                let html = '<table><thead><tr><th>Customer ID</th><th>Name</th><th>Country</th><th>Mobile</th><th>Status</th></tr></thead><tbody>';
+                
+                Object.keys(customers).forEach(key => {
+                    const customer = customers[key];
+                    html += `
+                        <tr>
+                            <td><strong>${customer.customerId}</strong></td>
+                            <td>${customer.name}</td>
+                            <td>${customer.country}</td>
+                            <td>${customer.mobile}</td>
+                            <td><span class="status-badge status-active">Active</span></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                customersList.innerHTML = html;
+            });
+        }
+
+        // Load Customer Dropdown
+        function loadCustomerDropdown() {
+            database.ref('customers').on('value', (snapshot) => {
+                const customers = snapshot.val();
+                const select = document.getElementById('invoiceCustomerId');
+                
+                select.innerHTML = '<option value="">-- Select Customer --</option>';
+                
+                if (customers) {
+                    Object.keys(customers).forEach(key => {
+                        const customer = customers[key];
+                        select.innerHTML += `<option value="${customer.customerId}">${customer.customerId} - ${customer.name}</option>`;
+                    });
+                }
+            });
+        }
+
+        // Create Customer
+        document.getElementById('createCustomerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const customerData = {
+                customerId: document.getElementById('newCustomerId').value,
+                password: document.getElementById('newCustomerPassword').value,
+                name: document.getElementById('newCustomerName').value,
+                country: document.getElementById('newCustomerCountry').value,
+                mobile: document.getElementById('newCustomerMobile').value,
+                vat: document.getElementById('newCustomerVAT').value,
+                createdAt: Date.now()
+            };
+
+            database.ref('customers').push(customerData)
+                .then(() => {
+                    document.getElementById('createCustomerMessage').innerHTML = '<div class="alert alert-success">✓ Customer created successfully!</div>';
+                    document.getElementById('createCustomerForm').reset();
+                })
+                .catch((error) => {
+                    document.getElementById('createCustomerMessage').innerHTML = `<div class="alert alert-error">❌ Error: ${error.message}</div>`;
+                });
+        });
+
+        // Save Invoice
+        document.getElementById('invoiceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const customerId = document.getElementById('invoiceCustomerId').value;
+            const invoiceData = {
+                invoiceNumber: document.getElementById('invoiceNumber').value,
+                date: document.getElementById('invoiceDate').value,
+                dueDate: document.getElementById('invoiceDueDate').value,
+                productName: document.getElementById('productName').value,
+                qty: document.getElementById('productQty').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                discount: parseFloat(document.getElementById('productDiscount').value),
+                tax: parseFloat(document.getElementById('productTax').value),
+                chequeCharge: parseFloat(document.getElementById('chequeCharge').value),
+                foreignTaxPercent: parseFloat(document.getElementById('foreignTaxPercent').value),
+                paymentStatus: document.getElementById('paymentStatus').value,
+                amountPaid: parseFloat(document.getElementById('amountPaid').value),
+                updatedAt: Date.now()
+            };
+
+            database.ref('invoices/' + customerId).set(invoiceData)
+                .then(() => {
+                    document.getElementById('invoiceMessage').innerHTML = '<div class="alert alert-success">✓ Invoice saved successfully!</div>';
+                })
+                .catch((error) => {
+                    document.getElementById('invoiceMessage').innerHTML = `<div class="alert alert-error">❌ Error: ${error.message}</div>`;
+                });
+        });
+
+        // Update Lottery Results
+        document.getElementById('lotteryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const resultsData = {
+                date: document.getElementById('lotteryDate').value,
+                firstPrize: document.getElementById('firstPrize').value,
+                threeDigitFront: document.getElementById('threeDigitFront').value.split(','),
+                threeDigitBack: document.getElementById('threeDigitBack').value.split(','),
+                twoDigit: document.getElementById('twoDigit').value,
+                updatedAt: Date.now()
+            };
+
+            database.ref('lotteryResults').set(resultsData)
+                .then(() => {
+                    document.getElementById('lotteryMessage').innerHTML = '<div class="alert alert-success">✓ Lottery results updated!</div>';
+                })
+                .catch((error) => {
+                    document.getElementById('lotteryMessage').innerHTML = `<div class="alert alert-error">❌ Error: ${error.message}</div>`;
+                });
+        });
+
+        // Update Settings
+        document.getElementById('settingsForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const settingsData = {
+                ticketPassword: document.getElementById('ticketPassword').value,
+                whatsappNumber: document.getElementById('whatsappNumber').value,
+                contactEmail: document.getElementById('contactEmail').value,
+                updatedAt: Date.now()
+            };
+
+            database.ref('settings').set(settingsData)
+                .then(() => {
+                    document.getElementById('settingsMessage').innerHTML = '<div class="alert alert-success">✓ Settings saved successfully!</div>';
+                })
+                .catch((error) => {
+                    document.getElementById('settingsMessage').innerHTML = `<div class="alert alert-error">❌ Error: ${error.message}</div>`;
+                });
+        });
+
+        // Approve Signup
+        function approveSignup(signupKey, name, mobile, country) {
+            if (confirm(`Approve signup for ${name}?`)) {
+                // Move to customers
+                const customerId = 'CUST' + Date.now().toString().substr(-6);
+                const password = 'pwd' + Math.random().toString(36).substr(2, 8);
+                
+                const customerData = {
+                    customerId: customerId,
+                    password: password,
+                    name: name,
+                    mobile: mobile,
+                    country: country,
+                    createdAt: Date.now()
+                };
+
+                database.ref('customers').push(customerData)
+                    .then(() => {
+                        // Delete from signups
+                        return database.ref('signups/' + signupKey).remove();
+                    })
+                    .then(() => {
+                        alert(`✓ Customer approved!\n\nCustomer ID: ${customerId}\nPassword: ${password}\n\nPlease send these credentials to the customer via WhatsApp.`);
+                    })
+                    .catch((error) => {
+                        alert('Error: ' + error.message);
+                    });
+            }
+        }
+
+        // Change Admin Password
+        document.getElementById('changePasswordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('newAdminPassword').value;
+            
+            database.ref('adminSettings').set({
+                username: ADMIN_USERNAME,
+                password: newPassword,
+                updatedAt: Date.now()
+            })
+                .then(() => {
+                    document.getElementById('passwordMessage').innerHTML = '<div class="alert alert-success">✓ Password updated! Please use the new password next time you login.</div>';
+                    document.getElementById('changePasswordForm').reset();
+                })
+                .catch((error) => {
+                    document.getElementById('passwordMessage').innerHTML = `<div class="alert alert-error">❌ Error: ${error.message}</div>`;
+                });
+        });
+    </script>
+</body>
+</html>
