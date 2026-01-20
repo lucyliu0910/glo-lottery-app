@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e5bb8">
+    <title>Buy Lottery Tickets - Official GLO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(180deg, #1976d2 0%, #1e88e5 100%);
+            min-height: 100vh;
+            padding-bottom: 70px;
+            overflow-x: hidden;
+        }
+
+        /* ===== LOADER STYLES ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .lottery-drum {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .drum-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            animation: drumRotate 3s ease-in-out infinite;
+        }
+
+        .drum-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 20px solid #0d8dd9;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow:
+                inset 0 0 30px rgba(30, 91, 184, 0.2),
+                0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px;
+            height: 20px;
+            background: linear-gradient(90deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: #1e5bb8;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-stand {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 30px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .drum-stand::before,
+        .drum-stand::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+        }
+
+        .drum-stand::before {
+            left: 30px;
+        }
+
+        .drum-stand::after {
+            right: 30px;
+        }
+
+        .balls-container {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: ballsRotate 2s linear infinite;
+        }
+
+        .lottery-ball {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 50%, #ffa5a5 100%);
+            border: 3px solid #c92a2a;
+            box-shadow:
+                inset -5px -5px 10px rgba(0, 0, 0, 0.2),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.5),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: ballBounce 1s ease-in-out infinite;
+        }
+
+        .lottery-ball:nth-child(1) {
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+
+        .lottery-ball:nth-child(2) {
+            top: 25%;
+            right: 15%;
+            animation-delay: 0.2s;
+        }
+
+        .lottery-ball:nth-child(3) {
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            animation-delay: 0.4s;
+        }
+
+        .lottery-ball:nth-child(4) {
+            bottom: 25%;
+            right: 15%;
+            animation-delay: 0.6s;
+        }
+
+        .lottery-ball:nth-child(5) {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0.8s;
+        }
+
+        .lottery-ball:nth-child(6) {
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 1s;
+        }
+
+        .lottery-ball:nth-child(7) {
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+            animation-delay: 1.2s;
+        }
+
+        .lottery-ball:nth-child(8) {
+            top: 25%;
+            left: 15%;
+            animation-delay: 1.4s;
+        }
+
+        .lottery-ball:nth-child(9) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: centerBallPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text {
+            margin-top: 80px;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text-sub {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            text-align: center;
+        }
+
+        @keyframes drumRotate {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        @keyframes ballsRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes ballBounce {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.1) translateY(-5px); }
+        }
+
+        @keyframes centerBallPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Page Header */
+        .page-header {
+            padding: 20px;
+            text-align: center;
+        }
+
+        .page-title-thai {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 5px;
+        }
+
+        .page-title-english {
+            font-size: 16px;
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Content */
+        .content {
+            padding: 0 15px 20px 15px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Product Card */
+        .product-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            position: relative;
+        }
+
+        .vip-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #1a1a2e;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            z-index: 10;
+            box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .product-content {
+            padding: 20px;
+        }
+
+        .product-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: 8px;
+        }
+
+        .product-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .price-section {
+            margin-bottom: 15px;
+            padding: 12px;
+            background: rgba(25, 118, 210, 0.05);
+            border-radius: 10px;
+        }
+
+        .price-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .price {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1976d2;
+        }
+
+        .currency {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .features-list {
+            list-style: none;
+            margin-bottom: 20px;
+        }
+
+        .features-list li {
+            padding: 8px 0;
+            font-size: 13px;
+            color: #333;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.4;
+        }
+
+        .features-list li::before {
+            content: '✓';
+            color: #4CAF50;
+            font-weight: 700;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .buy-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #1976d2, #1e88e5);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            box-shadow: 0 4px 12px rgba(25, 118, 210, 0.3);
+        }
+
+        .buy-button:active {
+            transform: scale(0.98);
+        }
+
+        /* COD Section */
+        .cod-section {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .cod-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .cod-icon {
+            font-size: 24px;
+        }
+
+        .cod-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1976d2;
+        }
+
+        .cod-description {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .cod-features {
+            list-style: none;
+        }
+
+        .cod-features li {
+            padding: 10px 0;
+            font-size: 14px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cod-features li::before {
+            content: '✓';
+            width: 24px;
+            height: 24px;
+            background: #4CAF50;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            font-size: 14px;
+        }
+
+        /* WhatsApp Button */
+        .whatsapp-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: white;
+            padding: 16px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            margin-bottom: 20px;
+        }
+
+        .whatsapp-button:active {
+            transform: scale(0.98);
+        }
+
+        .whatsapp-icon {
+            font-size: 24px;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 6px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            text-decoration: none;
+            color: #999;
+            font-size: 11px;
+            padding: 4px 8px;
+            position: relative;
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .nav-item.active {
+            color: #1976d2;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 3px;
+            background: #1976d2;
+            border-radius: 0 0 3px 3px;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+
+        @media (max-width: 400px) {
+            .page-title-thai {
+                font-size: 24px;
+            }
+            .product-title {
+                font-size: 18px;
+            }
+            .price {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .lottery-drum {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loader -->
+    <div id="loader">
+        <div class="lottery-drum">
+            <div class="drum-container">
+                <div class="drum-ring"></div>
+                <div class="drum-handle"></div>
+                <div class="balls-container">
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                </div>
+            </div>
+            <div class="drum-stand"></div>
+        </div>
+        <div class="loading-text">กำลังโหลด...</div>
+        <div class="loading-text-sub">Buy Ticket</div>
+    </div>
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="page-title-thai">ซื้อสลาก</div>
+        <div class="page-title-english">Buy Lottery Tickets</div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Product 1 -->
+        <div class="product-card">
+            <img src="images/product1.jpg" alt="Thailand Lottery 3UP Set" class="product-image">
+            <div class="product-content">
+                <h2 class="product-title">Thailand Lottery 3UP Set</h2>
+                <p class="product-description">Official GLO lottery ticket package with guaranteed authenticity and verified by agent Lucy Liu.</p>
+                
+                <div class="price-section">
+                    <div class="price-label">Price</div>
+                    <div class="price">
+                        <span class="currency">SAR</span> 4,400
+                    </div>
+                </div>
+
+                <ul class="features-list">
+                    <li>100% Official GLO Tickets</li>
+                    <li>Only 1 Set Direct 3UP Number</li>
+                    <li>Only Straight, No Rumble</li>
+                    <li>Money-back Guarantee if Not Win</li>
+                    <li>Verified by Agent Lucy Liu</li>
+                </ul>
+
+                <button class="buy-button" onclick="buyNow('Thailand Lottery 3UP Set', '4,400')">Buy Now</button>
+            </div>
+        </div>
+
+        <!-- Product 2 -->
+        <div class="product-card">
+            <div class="vip-badge">👑 VIP Customers Only</div>
+            <img src="images/product2.jpg" alt="Premium Lottery Package" class="product-image">
+            <div class="product-content">
+                <h2 class="product-title">Premium Lottery Package</h2>
+                <p class="product-description">Exclusive premium package for our valued old customers with multiple sets and priority support.</p>
+                
+                <div class="price-section">
+                    <div class="price-label">Price (Old Customers Only)</div>
+                    <div class="price">
+                        <span class="currency">SAR</span> 1,08,000
+                    </div>
+                </div>
+
+                <ul class="features-list">
+                    <li>100% Official GLO Tickets</li>
+                    <li>Multiple Set Package</li>
+                    <li>Only Straight, No Rumble</li>
+                    <li>Priority Support</li>
+                    <li>100% Refund if Not Win</li>
+                </ul>
+
+                <button class="buy-button" onclick="buyNow('Premium Lottery Package', '1,08,000')">Buy Now</button>
+            </div>
+        </div>
+
+        <!-- COD Section -->
+        <div class="cod-section">
+            <div class="cod-header">
+                <span class="cod-icon">💳</span>
+                <h3 class="cod-title">Cash on Delivery Available</h3>
+            </div>
+            <p class="cod-description">We offer secure Cash on Delivery payment option for your convenience. Order now and pay when you receive your lottery tickets!</p>
+            
+            <ul class="cod-features">
+                <li>Pay when you receive the tickets</li>
+                <li>Verify authenticity before payment</li>
+                <li>Free home delivery</li>
+                <li>100% secure transaction</li>
+            </ul>
+        </div>
+
+        <!-- WhatsApp Button -->
+        <a href="https://wa.me/447441343629?text=Hello%20Lucy%20Liu!%20I%27m%20interested%20in%20buying%20Thailand%20Lottery%20tickets.%20Please%20provide%20me%20details." class="whatsapp-button">
+            <span class="whatsapp-icon">📱</span>
+            <span>Contact Agent on WhatsApp</span>
+        </a>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <div class="nav-icon">🏠</div>
+            <div>หน้าหลัก</div>
+        </a>
+        <a href="buy-ticket.html" class="nav-item active">
+            <div class="nav-icon">🛒</div>
+            <div>Buy Ticket</div>
+        </a>
+        <a href="open-ticket.html" class="nav-item">
+            <div class="nav-icon">🔓</div>
+            <div>Open Ticket</div>
+        </a>
+        <a href="account.html" class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div>Account</div>
+        </a>
+        <a href="contact.html" class="nav-item">
+            <div class="nav-icon">📧</div>
+            <div>Contact</div>
+        </a>
+    </div>
+
+    <script>
+        // Security Features
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U') ||
+                (e.ctrlKey && e.key === 'p')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'PrintScreen') {
+                navigator.clipboard.writeText('');
+            }
+        });
+
+        // Hide loader after 2 seconds
+        setTimeout(() => {
+            document.getElementById('loader').classList.add('hidden');
+        }, 2000);
+
+        // Buy Now Function
+        function buyNow(productName, price) {
+            const message = `Hello Lucy Liu! I want to purchase ${productName} for SAR ${price}. Please provide me with the payment details and delivery information.`;
+            const encodedMessage = encodeURIComponent(message);
+            window.location.href = `https://wa.me/447441343629?text=${encodedMessage}`;
+        }
+    </script>
+</body>
+</html>

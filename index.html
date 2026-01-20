@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#1e5bb8">
+    <title>Official GLO - Thailand Government Lottery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(180deg, #1976d2 0%, #1e88e5 100%);
+            min-height: 100vh;
+            padding-bottom: 70px;
+            overflow-x: hidden;
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10001;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        #splash-screen img {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        /* ===== LOADER STYLES ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .lottery-drum {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .drum-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            animation: drumRotate 3s ease-in-out infinite;
+        }
+
+        .drum-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 20px solid #0d8dd9;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow:
+                inset 0 0 30px rgba(30, 91, 184, 0.2),
+                0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle {
+            position: absolute;
+            right: -60px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 80px;
+            height: 20px;
+            background: linear-gradient(90deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 30px;
+            height: 30px;
+            background: #1e5bb8;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-stand {
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 30px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .drum-stand::before,
+        .drum-stand::after {
+            content: '';
+            position: absolute;
+            top: -30px;
+            width: 20px;
+            height: 40px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+        }
+
+        .drum-stand::before {
+            left: 30px;
+        }
+
+        .drum-stand::after {
+            right: 30px;
+        }
+
+        .balls-container {
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: ballsRotate 2s linear infinite;
+        }
+
+        .lottery-ball {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 50%, #ffa5a5 100%);
+            border: 3px solid #c92a2a;
+            box-shadow:
+                inset -5px -5px 10px rgba(0, 0, 0, 0.2),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.5),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: ballBounce 1s ease-in-out infinite;
+        }
+
+        .lottery-ball:nth-child(1) {
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+
+        .lottery-ball:nth-child(2) {
+            top: 25%;
+            right: 15%;
+            animation-delay: 0.2s;
+        }
+
+        .lottery-ball:nth-child(3) {
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            animation-delay: 0.4s;
+        }
+
+        .lottery-ball:nth-child(4) {
+            bottom: 25%;
+            right: 15%;
+            animation-delay: 0.6s;
+        }
+
+        .lottery-ball:nth-child(5) {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0.8s;
+        }
+
+        .lottery-ball:nth-child(6) {
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 1s;
+        }
+
+        .lottery-ball:nth-child(7) {
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+            animation-delay: 1.2s;
+        }
+
+        .lottery-ball:nth-child(8) {
+            top: 25%;
+            left: 15%;
+            animation-delay: 1.4s;
+        }
+
+        .lottery-ball:nth-child(9) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: centerBallPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text {
+            margin-top: 80px;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            text-align: center;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text-sub {
+            margin-top: 10px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            text-align: center;
+        }
+
+        @keyframes drumRotate {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        @keyframes ballsRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes ballBounce {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.1) translateY(-5px); }
+        }
+
+        @keyframes centerBallPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Header */
+        .header {
+            padding: 15px 20px 10px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-logo {
+            width: 55px;
+            height: 55px;
+            background: white;
+            border-radius: 50%;
+            padding: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+
+        .header-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .header-text h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0;
+            line-height: 1.2;
+        }
+
+        .header-text p {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.95);
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        /* Content */
+        .content {
+            padding: 15px 15px 20px 15px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Date Section */
+        .date-header {
+            font-size: 18px;
+            font-weight: 500;
+            color: white;
+            margin-bottom: 12px;
+        }
+
+        .date-box {
+            background: white;
+            border-radius: 25px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .date-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .calendar-icon {
+            font-size: 24px;
+            opacity: 0.5;
+        }
+
+        /* Results Card */
+        .results-card {
+            background: white;
+            border-radius: 20px;
+            padding: 25px 15px 20px 15px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Watermark Logo */
+        .results-card::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 280px;
+            height: 280px;
+            background-image: url('images/watermark.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            opacity: 0.04;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .results-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 20px;
+        }
+
+        /* First Prize Section */
+        .first-prize-section {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .prize-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+
+        .prize-icon {
+            font-size: 24px;
+        }
+
+        .prize-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .prize-sublabel {
+            font-size: 14px;
+            color: #1976d2;
+            margin-bottom: 3px;
+        }
+
+        .prize-amount {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .first-prize-number {
+            font-size: 52px;
+            font-weight: 800;
+            color: #1976d2;
+            letter-spacing: 6px;
+            line-height: 1;
+        }
+
+        /* Three Prizes Grid */
+        .three-prizes-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .prize-column {
+            padding: 10px 5px;
+        }
+
+        .prize-column-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 3px;
+        }
+
+        .prize-column-amount {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .prize-numbers {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .prize-number {
+            font-size: 26px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .two-digit-number {
+            font-size: 36px;
+            font-weight: 800;
+            color: #333;
+        }
+
+        /* Expand Button */
+        .expand-button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(25, 118, 210, 0.08);
+            border: none;
+            border-radius: 25px;
+            color: #1976d2;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-bottom: 15px;
+            font-family: 'Prompt', sans-serif;
+        }
+
+        .expand-arrow {
+            font-size: 12px;
+        }
+
+        /* N3 Section */
+        .n3-section {
+            background: white;
+            border: 2px solid #1976d2;
+            border-radius: 18px;
+            padding: 20px 15px;
+            position: relative;
+        }
+
+        .n3-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .n3-icon {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1976d2;
+        }
+
+        .n3-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .new-badge {
+            background: #ff4757;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .n3-subtitle {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 3px;
+        }
+
+        .n3-amount {
+            text-align: center;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .n3-main-number {
+            text-align: center;
+            font-size: 64px;
+            font-weight: 800;
+            color: #333;
+            margin-bottom: 18px;
+            line-height: 1;
+        }
+
+        .n3-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .n3-column {
+            text-align: center;
+        }
+
+        .n3-column-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1976d2;
+            margin-bottom: 3px;
+        }
+
+        .n3-column-amount {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .n3-column-numbers {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .n3-column-number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 6px 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            text-decoration: none;
+            color: #999;
+            font-size: 11px;
+            padding: 4px 8px;
+            position: relative;
+            flex: 1;
+            max-width: 80px;
+        }
+
+        .nav-item.active {
+            color: #1976d2;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 35px;
+            height: 3px;
+            background: #1976d2;
+            border-radius: 0 0 3px 3px;
+        }
+
+        .nav-icon {
+            font-size: 22px;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .header-text h1 {
+                font-size: 24px;
+            }
+            .first-prize-number {
+                font-size: 46px;
+                letter-spacing: 4px;
+            }
+            .prize-number {
+                font-size: 22px;
+            }
+            .two-digit-number {
+                font-size: 32px;
+            }
+            .n3-main-number {
+                font-size: 56px;
+            }
+            .n3-column-number {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .lottery-drum {
+                width: 250px;
+                height: 250px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="images/splash.png" alt="GLO Splash">
+    </div>
+
+    <!-- Loader -->
+    <div id="loader">
+        <div class="lottery-drum">
+            <div class="drum-container">
+                <div class="drum-ring"></div>
+                <div class="drum-handle"></div>
+                <div class="balls-container">
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                </div>
+            </div>
+            <div class="drum-stand"></div>
+        </div>
+        <div class="loading-text">กำลังโหลด...</div>
+        <div class="loading-text-sub">หน้าหลัก</div>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="header-logo">
+            <img src="images/watermark.png" alt="GLO Logo">
+        </div>
+        <div class="header-text">
+            <h1>Official GLO</h1>
+            <p>สำนักงานสลากกินแบ่งรัฐบาล</p>
+        </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+        <!-- Date Header -->
+        <div class="date-header">ผลสลากกินแบ่งรัฐบาล งวดวันที่</div>
+        
+        <!-- Date Box -->
+        <div class="date-box">
+            <div class="date-text" id="draw-date">1 ธันวาคม 2568</div>
+            <div class="calendar-icon">📅</div>
+        </div>
+
+        <!-- Results Card -->
+        <div class="results-card">
+            <div class="card-title">สลากกินแบ่งรัฐบาล</div>
+
+            <!-- First Prize -->
+            <div class="first-prize-section">
+                <div class="prize-header">
+                    <span class="prize-icon">🎫</span>
+                    <span class="prize-label">สลากหลัก</span>
+                </div>
+                <div class="prize-sublabel">รางวัลที่ 1</div>
+                <div class="prize-amount" id="first-prize-amount">รางวัละ: 6,000,000 บาท</div>
+                <div class="first-prize-number" id="first-prize">461252</div>
+            </div>
+
+            <!-- Three Prizes Grid -->
+            <div class="three-prizes-grid">
+                <!-- 3 Digit Front -->
+                <div class="prize-column">
+                    <div class="prize-column-title">เลขหน้า 3 ตัว</div>
+                    <div class="prize-column-amount">รางวัละ: 4,000 บาท</div>
+                    <div class="prize-numbers" id="three-digit-front">
+                        <div class="prize-number">389</div>
+                        <div class="prize-number">655</div>
+                    </div>
+                </div>
+
+                <!-- 3 Digit Back -->
+                <div class="prize-column">
+                    <div class="prize-column-title">เลขท้าย 3 ตัว</div>
+                    <div class="prize-column-amount">รางวัละ: 4,000 บาท</div>
+                    <div class="prize-numbers" id="three-digit-back">
+                        <div class="prize-number">137</div>
+                        <div class="prize-number">995</div>
+                    </div>
+                </div>
+
+                <!-- 2 Digit -->
+                <div class="prize-column">
+                    <div class="prize-column-title">เลขท้าย 2 ตัว</div>
+                    <div class="prize-column-amount">รางวัละ: 2,000 บาท</div>
+                    <div class="prize-numbers">
+                        <div class="two-digit-number" id="two-digit">22</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expand Button -->
+            <button class="expand-button" onclick="toggleN3()">
+                ตรวจสลากฯ งวดนี้เพิ่มเติม
+                <span class="expand-arrow" id="expand-arrow">▼</span>
+            </button>
+
+            <!-- N3 Section -->
+            <div class="n3-section" id="n3-section" style="display: none;">
+                <div class="n3-header">
+                    <span class="n3-icon">🎪</span>
+                    <span class="n3-title">สลากตัวเลสามหลัก</span>
+                    <span class="new-badge">⭐New</span>
+                </div>
+                <div class="n3-subtitle">รางวัลสามตรง</div>
+                <div class="n3-amount">รางวัละ: 4,116.00 บาท</div>
+                <div class="n3-main-number">252</div>
+                
+                <div class="n3-grid">
+                    <div class="n3-column">
+                        <div class="n3-column-title">รางวัลสามหลัก</div>
+                        <div class="n3-column-amount">รางวัละ: 1,997.00 บาท</div>
+                        <div class="n3-column-numbers">
+                            <span class="n3-column-number">225</span>
+                            <span class="n3-column-number">522</span>
+                        </div>
+                    </div>
+                    <div class="n3-column">
+                        <div class="n3-column-title">รางวัลสองตรง</div>
+                        <div class="n3-column-amount">รางวัละ: 545.00 บาท</div>
+                        <div class="n3-column-numbers">
+                            <span class="n3-column-number">22</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item active">
+            <div class="nav-icon">🏠</div>
+            <div>หน้าหลัก</div>
+        </a>
+        <a href="buy-ticket.html" class="nav-item">
+            <div class="nav-icon">🛒</div>
+            <div>Buy Ticket</div>
+        </a>
+        <a href="open-ticket.html" class="nav-item">
+            <div class="nav-icon">🔓</div>
+            <div>Open Ticket</div>
+        </a>
+        <a href="account.html" class="nav-item">
+            <div class="nav-icon">👤</div>
+            <div>Account</div>
+        </a>
+        <a href="contact.html" class="nav-item">
+            <div class="nav-icon">📧</div>
+            <div>Contact</div>
+        </a>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrnJs19gMKZl4s8YXau_oz-07FWjbMcy8",
+            authDomain: "glo-lottery-app.firebaseapp.com",
+            databaseURL: "https://glo-lottery-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "glo-lottery-app",
+            storageBucket: "glo-lottery-app.firebasestorage.app",
+            messagingSenderId: "466299066608",
+            appId: "1:466299066608:web:fcfce72fac4787ac978a35"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Security Features
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U') ||
+                (e.ctrlKey && e.key === 'p')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'PrintScreen') {
+                navigator.clipboard.writeText('');
+            }
+        });
+
+        // Splash Screen (3 seconds)
+        setTimeout(() => {
+            document.getElementById('splash-screen').classList.add('hidden');
+        }, 3000);
+
+        // Loader (show after splash, hide after 2 seconds)
+        setTimeout(() => {
+            document.getElementById('loader').classList.add('hidden');
+        }, 5000); // 3s splash + 2s loader
+
+        // Load lottery results from Firebase
+        database.ref('lotteryResults').on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                // Update date
+                if (data.date) {
+                    document.getElementById('draw-date').textContent = data.date;
+                }
+                
+                // Update first prize
+                if (data.firstPrize) {
+                    document.getElementById('first-prize').textContent = data.firstPrize;
+                }
+                
+                // Update 3 digit front
+                if (data.threeDigitFront) {
+                    const numbers = data.threeDigitFront.split(',').map(n => n.trim());
+                    let html = '';
+                    numbers.forEach(num => {
+                        html += `<div class="prize-number">${num}</div>`;
+                    });
+                    document.getElementById('three-digit-front').innerHTML = html;
+                }
+                
+                // Update 3 digit back
+                if (data.threeDigitBack) {
+                    const numbers = data.threeDigitBack.split(',').map(n => n.trim());
+                    let html = '';
+                    numbers.forEach(num => {
+                        html += `<div class="prize-number">${num}</div>`;
+                    });
+                    document.getElementById('three-digit-back').innerHTML = html;
+                }
+                
+                // Update 2 digit
+                if (data.twoDigit) {
+                    document.getElementById('two-digit').textContent = data.twoDigit;
+                }
+            }
+        });
+
+        // Toggle N3 Section
+        function toggleN3() {
+            const section = document.getElementById('n3-section');
+            const arrow = document.getElementById('expand-arrow');
+            if (section.style.display === 'none') {
+                section.style.display = 'block';
+                arrow.textContent = '▲';
+            } else {
+                section.style.display = 'none';
+                arrow.textContent = '▼';
+            }
+        }
+    </script>
+</body>
+</html>
