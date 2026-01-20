@@ -932,7 +932,7 @@
                             </div>
                             <div>
                                 <label class="form-label">Contact Email</label>
-                                <input type="email" class="form-input" id="contactEmail" placeholder="governmentlotteryoffice@gmail.com" required>
+                                <input type="email" class="form-input" id="contactEmail" placeholder="governmentl0tteryoffice@gmail.com" required>
                             </div>
                             <div>
                                 <label class="form-label">New Admin Password</label>
@@ -1002,7 +1002,7 @@
             const errorDiv = document.getElementById('loginError');
 
             database.ref('adminSettings').once('value').then((snapshot) => {
-                const adminData = snapshot.val() || { username: 'admin', password: 'admin123' };
+                const adminData = snapshot.val() || { username: 'admin', password: 'IASno@16103' };
                 
                 if (username === adminData.username && password === adminData.password) {
                     // Login successful
@@ -1282,7 +1282,7 @@
                 const data = snapshot.val() || {};
                 document.getElementById('ticketPassword').value = data.ticketPassword || 'ARSB3984';
                 document.getElementById('whatsappNumber').value = data.whatsappNumber || '+44 7441 343629';
-                document.getElementById('contactEmail').value = data.contactEmail || 'governmentlotteryoffice@gmail.com';
+                document.getElementById('contactEmail').value = data.contactEmail || 'governmentl0tteryoffice@gmail.com';
             });
         }
 
