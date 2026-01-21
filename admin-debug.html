@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Debug - Check Firebase</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #1976d2;
+            margin-bottom: 20px;
+        }
+        .info-box {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #1976d2;
+        }
+        .error-box {
+            background: #ffebee;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #f44336;
+        }
+        .success-box {
+            background: #e8f5e9;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #4caf50;
+        }
+        button {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #1565c0;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>🔍 Admin Login Debugger</h1>
+        <p>This page will show you exactly what's stored in Firebase and help diagnose the login issue.</p>
+        
+        <button onclick="checkFirebase()">🔍 Check What's in Firebase</button>
+        <button onclick="resetToDefault()">🔄 Reset to Default (admin/admin123)</button>
+        
+        <div id="result"></div>
+    </div>
+
+    <div class="card">
+        <h2>🧪 Test Login</h2>
+        <p>Enter credentials to test (they will be compared with Firebase):</p>
+        
+        <label>Username:</label>
+        <input type="text" id="testUsername" placeholder="Enter username" value="admin">
+        
+        <label>Password:</label>
+        <input type="text" id="testPassword" placeholder="Enter password" value="admin123">
+        
+        <button onclick="testLogin()">🧪 Test These Credentials</button>
+        
+        <div id="testResult"></div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrnJs19gMKZl4s8YXau_oz-07FWjbMcy8",
+            authDomain: "glo-lottery-app.firebaseapp.com",
+            databaseURL: "https://glo-lottery-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "glo-lottery-app",
+            storageBucket: "glo-lottery-app.firebasestorage.app",
+            messagingSenderId: "466299066608",
+            appId: "1:466299066608:web:fcfce72fac4787ac978a35"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        function checkFirebase() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="info-box">🔄 Checking Firebase...</div>';
+            
+            database.ref('adminSettings').once('value').then((snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    resultDiv.innerHTML = `
+                        <div class="success-box">
+                            <h3>✅ Found adminSettings in Firebase:</h3>
+                            <p><strong>Username:</strong> <code>${data.username || 'NOT SET'}</code></p>
+                            <p><strong>Password:</strong> <code>${data.password || 'NOT SET'}</code></p>
+                            <br>
+                            <p><strong>Username Length:</strong> ${(data.username || '').length} characters</p>
+                            <p><strong>Password Length:</strong> ${(data.password || '').length} characters</p>
+                            <br>
+                            <p><strong>⚠️ Copy these exact values to login!</strong></p>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="error-box">
+                            <h3>❌ No adminSettings found in Firebase!</h3>
+                            <p>The <code>adminSettings</code> node doesn't exist in your database.</p>
+                            <p>Click "Reset to Default" button to create it.</p>
+                        </div>
+                    `;
+                }
+            }).catch((error) => {
+                resultDiv.innerHTML = `
+                    <div class="error-box">
+                        <h3>❌ Error reading Firebase:</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function resetToDefault() {
+            if (!confirm('Reset admin credentials to:\nUsername: admin\nPassword: admin123\n\nAre you sure?')) {
+                return;
+            }
+            
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '<div class="info-box">🔄 Resetting to default...</div>';
+            
+            database.ref('adminSettings').set({
+                username: 'admin',
+                password: 'admin123',
+                updatedAt: new Date().toISOString()
+            }).then(() => {
+                resultDiv.innerHTML = `
+                    <div class="success-box">
+                        <h3>✅ Reset Successful!</h3>
+                        <p><strong>Username:</strong> <code>admin</code></p>
+                        <p><strong>Password:</strong> <code>admin123</code></p>
+                        <br>
+                        <p>Now try logging in to the admin panel with these credentials.</p>
+                        <p><a href="admin.html" style="color: #1976d2; font-weight: bold;">→ Go to Admin Panel</a></p>
+                    </div>
+                `;
+            }).catch((error) => {
+                resultDiv.innerHTML = `
+                    <div class="error-box">
+                        <h3>❌ Error resetting:</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function testLogin() {
+            const username = document.getElementById('testUsername').value.trim();
+            const password = document.getElementById('testPassword').value.trim();
+            const resultDiv = document.getElementById('testResult');
+            
+            resultDiv.innerHTML = '<div class="info-box">🔄 Testing credentials...</div>';
+            
+            database.ref('adminSettings').once('value').then((snapshot) => {
+                const adminData = snapshot.val() || { username: 'admin', password: 'admin123' };
+                
+                let html = '<div class="info-box"><h3>📊 Comparison:</h3>';
+                html += `<p><strong>Firebase Username:</strong> <code>${adminData.username}</code> (${adminData.username.length} chars)</p>`;
+                html += `<p><strong>Your Username:</strong> <code>${username}</code> (${username.length} chars)</p>`;
+                html += `<p><strong>Match:</strong> ${username === adminData.username ? '✅ YES' : '❌ NO'}</p>`;
+                html += '<br>';
+                html += `<p><strong>Firebase Password:</strong> <code>${adminData.password}</code> (${adminData.password.length} chars)</p>`;
+                html += `<p><strong>Your Password:</strong> <code>${password}</code> (${password.length} chars)</p>`;
+                html += `<p><strong>Match:</strong> ${password === adminData.password ? '✅ YES' : '❌ NO'}</p>`;
+                html += '</div>';
+                
+                if (username === adminData.username && password === adminData.password) {
+                    html += `
+                        <div class="success-box">
+                            <h3>✅ LOGIN WOULD SUCCEED!</h3>
+                            <p>These credentials match what's in Firebase.</p>
+                            <p><a href="admin.html" style="color: #1976d2; font-weight: bold;">→ Go to Admin Panel</a></p>
+                        </div>
+                    `;
+                } else {
+                    html += `
+                        <div class="error-box">
+                            <h3>❌ LOGIN WOULD FAIL!</h3>
+                            <p>The credentials you entered don't match what's in Firebase.</p>
+                            <p><strong>Solution:</strong> Use the exact username and password shown in the "Check Firebase" section above.</p>
+                        </div>
+                    `;
+                }
+                
+                resultDiv.innerHTML = html;
+            });
+        }
+
+        // Auto-check on page load
+        window.onload = function() {
+            checkFirebase();
+        };
+    </script>
+</body>
+</html>
