@@ -19,6 +19,9 @@
             -webkit-touch-callout: none;
             -webkit-tap-highlight-color: transparent;
         }
+        <link rel="manifest" href="manifest.json">
+        <meta name="theme-color" content="#1976d2">
+        <script src="screenshot-protection.js"></script>
 
         body {
             font-family: 'Prompt', 'Sarabun', Arial, sans-serif;
@@ -1408,5 +1411,18 @@
             document.getElementById('loginError').classList.remove('show');
         }
     </script>
+    <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/glo-lottery-app/service-worker.js')
+      .then(function(registration) {
+        console.log('ServiceWorker registered');
+      })
+      .catch(function(err) {
+        console.log('ServiceWorker registration failed: ', err);
+      });
+  });
+}
+</script>
 </body>
 </html>
