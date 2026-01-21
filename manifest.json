@@ -1,0 +1,37 @@
+{
+  "name": "Lucy Liu GLO lottery",
+  "short_name": "GLO lottery",
+  "description": "Check Thailand lottery results and check registration status",
+  "start_url": "/glo-lottery-app/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1976d2",
+  "orientation": "portrait-primary",
+  "scope": "/glo-lottery-app/",
+  "icons": [
+    {
+      "src": "images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "images/screenshot1.png",
+      "sizes": "540x960",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["entertainment", "finance", "games"],
+  "lang": "en-US",
+  "dir": "ltr",
+  "prefer_related_applications": false
+}
