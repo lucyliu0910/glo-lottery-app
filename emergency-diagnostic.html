@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚨 Emergency Diagnostic Tool - GLO Lottery</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Prompt', Arial, sans-serif;
+            background: linear-gradient(135deg, #1976d2 0%, #1e5bb8 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 {
+            color: #d32f2f;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            color: #666;
+            font-size: 16px;
+        }
+        
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        
+        .card h2 {
+            color: #1976d2;
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-box {
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .status-loading {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            color: #856404;
+        }
+        
+        .status-success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+        
+        .status-error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+        
+        .status-info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+        
+        .btn {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            font-family: 'Prompt', Arial, sans-serif;
+        }
+        
+        .btn:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.3);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+        }
+        
+        .diagnostic-item {
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .diagnostic-item.checking {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+        
+        .diagnostic-item.passed {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+        
+        .diagnostic-item.failed {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #1976d2;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .fix-suggestion {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 4px solid #1976d2;
+        }
+        
+        .fix-suggestion h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+        
+        .fix-suggestion ol {
+            margin-left: 20px;
+        }
+        
+        .fix-suggestion li {
+            margin: 5px 0;
+            color: #333;
+        }
+        
+        code {
+            background: #f5f5f5;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚨 Emergency Diagnostic Tool</h1>
+            <p>Automatic problem detection and fixes for Lucy Liu GLO Lottery App</p>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card">
+            <h2>⚡ Quick Actions</h2>
+            <button class="btn" onclick="runFullDiagnostic()">🔍 Run Full Diagnostic</button>
+            <button class="btn btn-success" onclick="testAllPages()">🌐 Test All Pages</button>
+            <button class="btn btn-danger" onclick="checkFirebase()">🔥 Check Firebase</button>
+            <button class="btn" onclick="checkSecurity()">🔒 Check Security</button>
+        </div>
+
+        <!-- Diagnostic Results -->
+        <div class="card">
+            <h2>📊 Diagnostic Results</h2>
+            <div id="diagnosticResults"></div>
+        </div>
+
+        <!-- Common Problems & Fixes -->
+        <div class="card">
+            <h2>🛠️ Common Problems & Automatic Fixes</h2>
+            <div id="commonProblems"></div>
+        </div>
+
+        <!-- Live Status -->
+        <div class="card">
+            <h2>📡 Live System Status</h2>
+            <div id="liveStatus"></div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrnJs19gMKZl4s8YXau_oz-07FWjbMcy8",
+            authDomain: "glo-lottery-app.firebaseapp.com",
+            databaseURL: "https://glo-lottery-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "glo-lottery-app",
+            storageBucket: "glo-lottery-app.firebasestorage.app",
+            messagingSenderId: "466299066608",
+            appId: "1:466299066608:web:fcfce72fac4787ac978a35"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        const diagnosticResults = document.getElementById('diagnosticResults');
+        const commonProblems = document.getElementById('commonProblems');
+        const liveStatus = document.getElementById('liveStatus');
+
+        // ======================
+        // FULL DIAGNOSTIC
+        // ======================
+        async function runFullDiagnostic() {
+            diagnosticResults.innerHTML = '<div class="status-loading"><div class="spinner"></div> Running comprehensive diagnostic...</div>';
+            
+            const checks = [
+                { name: 'Website Accessibility', test: checkWebsiteAccess },
+                { name: 'Firebase Connection', test: checkFirebaseConnection },
+                { name: 'Admin Panel Access', test: checkAdminAccess },
+                { name: 'Customer Login System', test: checkCustomerLogin },
+                { name: 'PWA Manifest', test: checkManifest },
+                { name: 'Service Worker', test: checkServiceWorker },
+                { name: 'Screenshot Protection', test: checkScreenshotProtection },
+                { name: 'All HTML Pages', test: checkAllPages }
+            ];
+
+            let html = '<div style="margin: 20px 0;">';
+            
+            for (const check of checks) {
+                html += `<div class="diagnostic-item checking" id="check-${check.name.replace(/ /g, '-')}">
+                    <span><strong>${check.name}</strong></span>
+                    <span class="spinner"></span>
+                </div>`;
+            }
+            
+            diagnosticResults.innerHTML = html + '</div>';
+
+            // Run checks sequentially
+            for (const check of checks) {
+                const checkId = `check-${check.name.replace(/ /g, '-')}`;
+                const checkElement = document.getElementById(checkId);
+                
+                try {
+                    const result = await check.test();
+                    
+                    if (result.passed) {
+                        checkElement.className = 'diagnostic-item passed';
+                        checkElement.innerHTML = `
+                            <span><strong>${check.name}</strong></span>
+                            <span style="color: #28a745;">✅ PASSED</span>
+                        `;
+                    } else {
+                        checkElement.className = 'diagnostic-item failed';
+                        checkElement.innerHTML = `
+                            <span><strong>${check.name}</strong><br><small>${result.message}</small></span>
+                            <span style="color: #dc3545;">❌ FAILED</span>
+                        `;
+                    }
+                } catch (error) {
+                    checkElement.className = 'diagnostic-item failed';
+                    checkElement.innerHTML = `
+                        <span><strong>${check.name}</strong><br><small>Error: ${error.message}</small></span>
+                        <span style="color: #dc3545;">❌ ERROR</span>
+                    `;
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            // Show summary
+            diagnosticResults.innerHTML += '<div class="status-success" style="margin-top: 20px;"><strong>✅ Diagnostic Complete!</strong><br>Check results above for any issues.</div>';
+        }
+
+        // ======================
+        // INDIVIDUAL CHECKS
+        // ======================
+        async function checkWebsiteAccess() {
+            try {
+                const response = await fetch('/glo-lottery-app/');
+                return { passed: response.ok, message: response.ok ? 'Website is accessible' : 'Website returned error' };
+            } catch (error) {
+                return { passed: false, message: 'Cannot reach website' };
+            }
+        }
+
+        async function checkFirebaseConnection() {
+            try {
+                const snapshot = await database.ref('.info/connected').once('value');
+                return { passed: snapshot.val() === true, message: snapshot.val() ? 'Firebase connected' : 'Firebase disconnected' };
+            } catch (error) {
+                return { passed: false, message: 'Firebase connection error' };
+            }
+        }
+
+        async function checkAdminAccess() {
+            try {
+                const snapshot = await database.ref('adminSettings').once('value');
+                return { passed: snapshot.exists(), message: snapshot.exists() ? 'Admin settings found' : 'Admin settings missing' };
+            } catch (error) {
+                return { passed: false, message: 'Cannot access admin settings' };
+            }
+        }
+
+        async function checkCustomerLogin() {
+            try {
+                const snapshot = await database.ref('customers').limitToFirst(1).once('value');
+                return { passed: true, message: 'Customer database accessible' };
+            } catch (error) {
+                return { passed: false, message: 'Cannot access customer database' };
+            }
+        }
+
+        async function checkManifest() {
+            try {
+                const response = await fetch('/glo-lottery-app/manifest.json');
+                return { passed: response.ok, message: response.ok ? 'Manifest file found' : 'Manifest file missing' };
+            } catch (error) {
+                return { passed: false, message: 'Manifest not accessible' };
+            }
+        }
+
+        async function checkServiceWorker() {
+            try {
+                const response = await fetch('/glo-lottery-app/service-worker.js');
+                return { passed: response.ok, message: response.ok ? 'Service worker found' : 'Service worker missing' };
+            } catch (error) {
+                return { passed: false, message: 'Service worker not accessible' };
+            }
+        }
+
+        async function checkScreenshotProtection() {
+            try {
+                const response = await fetch('/glo-lottery-app/screenshot-protection.js');
+                return { passed: response.ok, message: response.ok ? 'Protection script found' : 'Protection script missing' };
+            } catch (error) {
+                return { passed: false, message: 'Protection script not accessible' };
+            }
+        }
+
+        async function checkAllPages() {
+            const pages = ['index.html', 'buy-ticket.html', 'open-ticket.html', 'account.html', 'contact.html', 'admin.html'];
+            let allPassed = true;
+            
+            for (const page of pages) {
+                try {
+                    const response = await fetch(`/glo-lottery-app/${page}`);
+                    if (!response.ok) allPassed = false;
+                } catch (error) {
+                    allPassed = false;
+                }
+            }
+            
+            return { passed: allPassed, message: allPassed ? 'All pages accessible' : 'Some pages have errors' };
+        }
+
+        // ======================
+        // TEST ALL PAGES
+        // ======================
+        async function testAllPages() {
+            diagnosticResults.innerHTML = '<div class="status-loading"><div class="spinner"></div> Testing all pages...</div>';
+            
+            const pages = [
+                { name: 'Home Page', url: '/glo-lottery-app/index.html' },
+                { name: 'Buy Ticket', url: '/glo-lottery-app/buy-ticket.html' },
+                { name: 'Open Ticket', url: '/glo-lottery-app/open-ticket.html' },
+                { name: 'Account Login', url: '/glo-lottery-app/account.html' },
+                { name: 'Contact Page', url: '/glo-lottery-app/contact.html' },
+                { name: 'Admin Panel', url: '/glo-lottery-app/admin.html' }
+            ];
+
+            let html = '<div style="margin: 20px 0;">';
+            
+            for (const page of pages) {
+                try {
+                    const response = await fetch(page.url);
+                    const status = response.ok ? 'passed' : 'failed';
+                    const icon = response.ok ? '✅' : '❌';
+                    
+                    html += `
+                        <div class="diagnostic-item ${status}">
+                            <span>
+                                <strong>${page.name}</strong><br>
+                                <small>${page.url}</small>
+                            </span>
+                            <span>${icon} ${response.status}</span>
+                        </div>
+                    `;
+                } catch (error) {
+                    html += `
+                        <div class="diagnostic-item failed">
+                            <span>
+                                <strong>${page.name}</strong><br>
+                                <small>Error: ${error.message}</small>
+                            </span>
+                            <span>❌ ERROR</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            diagnosticResults.innerHTML = html + '</div>';
+        }
+
+        // ======================
+        // CHECK FIREBASE
+        // ======================
+        async function checkFirebase() {
+            diagnosticResults.innerHTML = '<div class="status-loading"><div class="spinner"></div> Checking Firebase...</div>';
+            
+            const checks = [
+                { name: 'Connection Status', ref: '.info/connected' },
+                { name: 'Admin Settings', ref: 'adminSettings' },
+                { name: 'Settings', ref: 'settings' },
+                { name: 'Lottery Results', ref: 'lotteryResults' },
+                { name: 'Customers Database', ref: 'customers' },
+                { name: 'Invoices Database', ref: 'invoices' }
+            ];
+
+            let html = '<div style="margin: 20px 0;">';
+            
+            for (const check of checks) {
+                try {
+                    const snapshot = await database.ref(check.ref).once('value');
+                    const exists = snapshot.exists() || snapshot.val() === true;
+                    const status = exists ? 'passed' : 'failed';
+                    const icon = exists ? '✅' : '❌';
+                    
+                    html += `
+                        <div class="diagnostic-item ${status}">
+                            <span><strong>${check.name}</strong></span>
+                            <span>${icon} ${exists ? 'EXISTS' : 'MISSING'}</span>
+                        </div>
+                    `;
+                } catch (error) {
+                    html += `
+                        <div class="diagnostic-item failed">
+                            <span><strong>${check.name}</strong><br><small>${error.message}</small></span>
+                            <span>❌ ERROR</span>
+                        </div>
+                    `;
+                }
+            }
+            
+            diagnosticResults.innerHTML = html + '</div>';
+        }
+
+        // ======================
+        // CHECK SECURITY
+        // ======================
+        async function checkSecurity() {
+            diagnosticResults.innerHTML = '<div class="status-loading"><div class="spinner"></div> Checking security features...</div>';
+            
+            let html = '<div style="margin: 20px 0;">';
+            
+            // Check screenshot protection
+            try {
+                const response = await fetch('/glo-lottery-app/screenshot-protection.js');
+                html += `
+                    <div class="diagnostic-item ${response.ok ? 'passed' : 'failed'}">
+                        <span><strong>Screenshot Protection Script</strong></span>
+                        <span>${response.ok ? '✅' : '❌'} ${response.ok ? 'ACTIVE' : 'MISSING'}</span>
+                    </div>
+                `;
+            } catch (error) {
+                html += `
+                    <div class="diagnostic-item failed">
+                        <span><strong>Screenshot Protection Script</strong></span>
+                        <span>❌ ERROR</span>
+                    </div>
+                `;
+            }
+
+            // Check HTTPS
+            html += `
+                <div class="diagnostic-item ${location.protocol === 'https:' ? 'passed' : 'failed'}">
+                    <span><strong>HTTPS Encryption</strong></span>
+                    <span>${location.protocol === 'https:' ? '✅ SECURE' : '⚠️ NOT SECURE'}</span>
+                </div>
+            `;
+
+            // Check Firebase security logs
+            try {
+                const snapshot = await database.ref('securityLogs').limitToLast(1).once('value');
+                html += `
+                    <div class="diagnostic-item passed">
+                        <span><strong>Security Logging</strong></span>
+                        <span>✅ ACTIVE</span>
+                    </div>
+                `;
+            } catch (error) {
+                html += `
+                    <div class="diagnostic-item failed">
+                        <span><strong>Security Logging</strong></span>
+                        <span>❌ ERROR</span>
+                    </div>
+                `;
+            }
+
+            diagnosticResults.innerHTML = html + '</div>';
+        }
+
+        // ======================
+        // SHOW COMMON PROBLEMS & FIXES
+        // ======================
+        function showCommonProblems() {
+            commonProblems.innerHTML = `
+                <div class="fix-suggestion">
+                    <h4>🚫 Problem: Website showing 404 error</h4>
+                    <ol>
+                        <li>Go to GitHub repository Settings</li>
+                        <li>Click "Pages" in left sidebar</li>
+                        <li>Under "Source", select branch: <code>main</code></li>
+                        <li>Click Save and wait 2-3 minutes</li>
+                    </ol>
+                </div>
+
+                <div class="fix-suggestion">
+                    <h4>🔐 Problem: Admin login showing "Invalid credentials"</h4>
+                    <ol>
+                        <li>Open <a href="admin-debug.html" target="_blank">admin-debug.html</a></li>
+                        <li>Click "Check What's in Firebase"</li>
+                        <li>Use exact username/password shown</li>
+                        <li>Or click "Reset to Default" button</li>
+                    </ol>
+                </div>
+
+                <div class="fix-suggestion">
+                    <h4>🔥 Problem: Firebase not connecting</h4>
+                    <ol>
+                        <li>Check your internet connection</li>
+                        <li>Open Firebase Console</li>
+                        <li>Verify Database Rules are published</li>
+                        <li>Check if database URL is correct</li>
+                    </ol>
+                </div>
+
+                <div class="fix-suggestion">
+                    <h4>📱 Problem: "Install app" not showing</h4>
+                    <ol>
+                        <li>Make sure manifest.json is uploaded</li>
+                        <li>Make sure service-worker.js is uploaded</li>
+                        <li>Make sure app icons (192x192, 512x512) are in images/ folder</li>
+                        <li>Clear browser cache and reload</li>
+                        <li>Wait 5 minutes after uploading files</li>
+                    </ol>
+                </div>
+
+                <div class="fix-suggestion">
+                    <h4>🖼️ Problem: Images not loading</h4>
+                    <ol>
+                        <li>Check if images are in <code>images/</code> folder</li>
+                        <li>Verify image file names match HTML references</li>
+                        <li>Check image paths: should be <code>images/filename.png</code></li>
+                        <li>Clear browser cache</li>
+                    </ol>
+                </div>
+
+                <div class="fix-suggestion">
+                    <h4>⚠️ Problem: Updates not showing in app</h4>
+                    <ol>
+                        <li>Close app completely</li>
+                        <li>Wait 2 minutes for GitHub Pages to rebuild</li>
+                        <li>Open app again</li>
+                        <li>Pull down to refresh</li>
+                    </ol>
+                </div>
+            `;
+        }
+
+        // ======================
+        // LIVE STATUS MONITORING
+        // ======================
+        function updateLiveStatus() {
+            database.ref('.info/connected').on('value', function(snapshot) {
+                const connected = snapshot.val();
+                
+                liveStatus.innerHTML = `
+                    <div class="status-${connected ? 'success' : 'error'}">
+                        <strong>${connected ? '✅ System Online' : '❌ System Offline'}</strong><br>
+                        Firebase: ${connected ? 'Connected' : 'Disconnected'}<br>
+                        Last checked: ${new Date().toLocaleString()}
+                    </div>
+                `;
+            });
+        }
+
+        // Initialize
+        window.onload = function() {
+            showCommonProblems();
+            updateLiveStatus();
+            
+            // Show welcome message
+            diagnosticResults.innerHTML = `
+                <div class="status-info">
+                    <strong>👋 Welcome to Emergency Diagnostic Tool!</strong><br><br>
+                    This tool helps you automatically detect and fix common problems with your GLO Lottery app.<br><br>
+                    Click any button above to start diagnostics.
+                </div>
+            `;
+        };
+    </script>
+</body>
+</html>
