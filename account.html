@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>My Account - Official GLO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1976d2">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Prompt', 'Sarabun', Arial, sans-serif;
+            background: linear-gradient(135deg, #1976d2 0%, #1e88e5 100%);
+            min-height: 100vh;
+            padding: 20px 20px 100px 20px;
+            overflow-x: hidden;
+        }
+
+        /* ===== LOADER STYLES (FIXED CUTE PROPORTIONS) ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .lottery-drum {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        .drum-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            animation: drumRotate 3s ease-in-out infinite;
+        }
+
+        .drum-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 16px solid #0d8dd9;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow:
+                inset 0 0 30px rgba(30, 91, 184, 0.2),
+                0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle {
+            position: absolute;
+            right: -50px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 65px;
+            height: 16px;
+            background: linear-gradient(90deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 25px;
+            height: 25px;
+            background: #1e5bb8;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-stand {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 165px;
+            height: 25px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .drum-stand::before,
+        .drum-stand::after {
+            content: '';
+            position: absolute;
+            top: -25px;
+            width: 16px;
+            height: 33px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+        }
+
+        .drum-stand::before {
+            left: 25px;
+        }
+
+        .drum-stand::after {
+            right: 25px;
+        }
+
+        .balls-container {
+            position: absolute;
+            width: 183px;
+            height: 183px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: ballsRotate 2s linear infinite;
+        }
+
+        .lottery-ball {
+            position: absolute;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 50%, #ffa5a5 100%);
+            border: 2.5px solid #c92a2a;
+            box-shadow:
+                inset -5px -5px 10px rgba(0, 0, 0, 0.2),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.5),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: ballBounce 1s ease-in-out infinite;
+        }
+
+        .lottery-ball:nth-child(1) {
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+
+        .lottery-ball:nth-child(2) {
+            top: 25%;
+            right: 15%;
+            animation-delay: 0.2s;
+        }
+
+        .lottery-ball:nth-child(3) {
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            animation-delay: 0.4s;
+        }
+
+        .lottery-ball:nth-child(4) {
+            bottom: 25%;
+            right: 15%;
+            animation-delay: 0.6s;
+        }
+
+        .lottery-ball:nth-child(5) {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0.8s;
+        }
+
+        .lottery-ball:nth-child(6) {
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 1s;
+        }
+
+        .lottery-ball:nth-child(7) {
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+            animation-delay: 1.2s;
+        }
+
+        .lottery-ball:nth-child(8) {
+            top: 25%;
+            left: 15%;
+            animation-delay: 1.4s;
+        }
+
+        .lottery-ball:nth-child(9) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: centerBallPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text {
+            margin-top: 60px;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text-sub {
+            margin-top: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        @keyframes drumRotate {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        @keyframes ballsRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes ballBounce {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.1) translateY(-5px); }
+        }
+
+        @keyframes centerBallPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @media (max-width: 360px) {
+            .lottery-drum {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .drum-ring {
+                border-width: 14px;
+            }
+            
+            .drum-handle {
+                right: -45px;
+                width: 58px;
+                height: 14px;
+            }
+            
+            .drum-handle::after {
+                width: 22px;
+                height: 22px;
+            }
+            
+            .drum-stand {
+                bottom: -30px;
+                width: 145px;
+                height: 22px;
+            }
+            
+            .drum-stand::before,
+            .drum-stand::after {
+                top: -22px;
+                width: 14px;
+                height: 29px;
+            }
+            
+            .balls-container {
+                width: 161px;
+                height: 161px;
+            }
+            
+            .lottery-ball {
+                width: 29px;
+                height: 29px;
+                border-width: 2px;
+            }
+            
+            .loading-text {
+                font-size: 18px;
+                margin-top: 50px;
+            }
+            
+            .loading-text-sub {
+                font-size: 13px;
+            }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        #main-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* ===== CHOICE SCREEN ===== */
+        .choice-card {
+            background: white;
+            border-radius: clamp(20px, 5vw, 25px);
+            padding: clamp(40px, 10vw, 50px) clamp(30px, 8vw, 40px);
+            max-width: 450px;
+            margin: clamp(40px, 10vh, 80px) auto;
+            text-align: center;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .account-logo {
+            width: clamp(80px, 20vw, 100px);
+            height: clamp(80px, 20vw, 100px);
+            margin: 0 auto clamp(25px, 6vw, 30px);
+        }
+
+        .account-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .account-title {
+            font-size: clamp(26px, 7vw, 32px);
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: clamp(30px, 8vw, 40px);
+        }
+
+        .choice-button {
+            width: 100%;
+            padding: clamp(14px, 4vw, 16px);
+            border: none;
+            border-radius: clamp(12px, 3vw, 15px);
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            margin-bottom: clamp(12px, 3vw, 15px);
+            transition: all 0.3s ease;
+            min-height: 56px;
+        }
+
+        .choice-button.login {
+            background: #1976d2;
+            color: white;
+        }
+
+        .choice-button.login:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
+        }
+
+        .choice-button.signup {
+            background: #ffd700;
+            color: #1a1a2e;
+        }
+
+        .choice-button.signup:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        /* ===== LOGIN/SIGNUP FORMS ===== */
+        .form-card {
+            background: white;
+            border-radius: clamp(20px, 5vw, 25px);
+            padding: clamp(30px, 8vw, 40px) clamp(25px, 6vw, 35px);
+            max-width: 500px;
+            margin: clamp(30px, 8vh, 40px) auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: clamp(25px, 6vw, 30px);
+        }
+
+        .form-title {
+            font-size: clamp(24px, 6vw, 28px);
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: clamp(8px, 2vw, 10px);
+        }
+
+        .form-subtitle {
+            color: #666;
+            font-size: clamp(13px, 3.5vw, 14px);
+        }
+
+        .form-group {
+            margin-bottom: clamp(18px, 4vw, 20px);
+        }
+
+        .form-label {
+            display: block;
+            font-size: clamp(13px, 3.5vw, 14px);
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: clamp(12px, 3vw, 14px) clamp(14px, 3.5vw, 16px);
+            border: 2px solid #e0e0e0;
+            border-radius: clamp(10px, 2.5vw, 12px);
+            font-size: clamp(15px, 4vw, 16px);
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
+        }
+
+        .form-button {
+            width: 100%;
+            padding: clamp(14px, 4vw, 16px);
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: clamp(12px, 3vw, 15px);
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.3s ease;
+            margin-top: clamp(8px, 2vw, 10px);
+            min-height: 56px;
+        }
+
+        .form-button:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
+        }
+
+        .back-link {
+            text-align: center;
+            margin-top: clamp(18px, 4vw, 20px);
+        }
+
+        .back-link a {
+            color: #1976d2;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: clamp(14px, 3.5vw, 15px);
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+
+        .error-message {
+            background: #ffebee;
+            color: #c62828;
+            padding: clamp(10px, 2.5vw, 12px);
+            border-radius: 8px;
+            margin-bottom: clamp(18px, 4vw, 20px);
+            font-size: clamp(13px, 3.5vw, 14px);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* ===== INVOICE SCREEN - MOBILE RESPONSIVE STACKED DESIGN ===== */
+        .invoice-container {
+            background: #2c3e50;
+            border-radius: clamp(15px, 4vw, 20px);
+            padding: 0;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Invoice Header */
+        .invoice-header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            padding: clamp(20px, 5vw, 30px);
+            border-bottom: 3px solid #ffd700;
+        }
+
+        .invoice-logo-section {
+            display: flex;
+            gap: clamp(15px, 4vw, 20px);
+            align-items: flex-start;
+            margin-bottom: clamp(15px, 4vw, 20px);
+        }
+
+        .invoice-logo {
+            width: clamp(60px, 16vw, 80px);
+            height: clamp(60px, 16vw, 80px);
+            background: linear-gradient(135deg, #64b5f6, #1976d2);
+            border-radius: clamp(12px, 3vw, 15px);
+            padding: clamp(8px, 2vw, 10px);
+            flex-shrink: 0;
+        }
+
+        .invoice-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .company-info {
+            color: white;
+            flex: 1;
+        }
+
+        .company-info h2 {
+            font-size: clamp(16px, 4vw, 20px);
+            font-weight: 700;
+            margin-bottom: clamp(6px, 1.5vw, 8px);
+        }
+
+        .company-info p {
+            font-size: clamp(10px, 2.5vw, 12px);
+            line-height: 1.5;
+            opacity: 0.9;
+        }
+
+        .registration-info {
+            text-align: center;
+            color: white;
+            background: rgba(255, 215, 0, 0.15);
+            padding: clamp(12px, 3vw, 15px);
+            border-radius: clamp(8px, 2vw, 10px);
+        }
+
+        .registration-info h3 {
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .registration-info p {
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        /* Invoice Body */
+        .invoice-body {
+            background: white;
+            padding: clamp(20px, 5vw, 30px);
+        }
+
+        /* Customer & Invoice Info */
+        .invoice-info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: clamp(15px, 4vw, 20px);
+            margin-bottom: clamp(20px, 5vw, 25px);
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: clamp(15px, 4vw, 18px);
+            border-radius: clamp(10px, 2.5vw, 12px);
+            border-left: 4px solid #1976d2;
+        }
+
+        .info-card h4 {
+            font-size: clamp(13px, 3.2vw, 15px);
+            font-weight: 700;
+            color: #1976d2;
+            margin-bottom: clamp(10px, 2.5vw, 12px);
+            text-transform: uppercase;
+        }
+
+        .info-card p {
+            font-size: clamp(12px, 3vw, 14px);
+            color: #333;
+            line-height: 1.6;
+            margin-bottom: 5px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: clamp(6px, 1.5vw, 8px) 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-size: clamp(11px, 2.8vw, 13px);
+            color: #666;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: clamp(11px, 2.8vw, 13px);
+            color: #333;
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Payment Status Badge - HIGHLIGHTED */
+        .payment-status-badge {
+            background: linear-gradient(135deg, #4caf50, #66bb6a);
+            color: white;
+            padding: clamp(15px, 4vw, 20px);
+            border-radius: clamp(12px, 3vw, 15px);
+            text-align: center;
+            margin-bottom: clamp(20px, 5vw, 25px);
+            box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
+        }
+
+        .payment-status-badge.partially-paid {
+            background: linear-gradient(135deg, #ff9800, #ffa726);
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.3);
+        }
+
+        .payment-status-badge.unpaid {
+            background: linear-gradient(135deg, #f44336, #ef5350);
+            box-shadow: 0 4px 15px rgba(244, 67, 54, 0.3);
+        }
+
+        .payment-status-badge h3 {
+            font-size: clamp(20px, 5vw, 28px);
+            font-weight: 800;
+            margin-bottom: clamp(5px, 1.2vw, 8px);
+        }
+
+        .payment-status-badge p {
+            font-size: clamp(12px, 3vw, 14px);
+            opacity: 0.95;
+        }
+
+        /* Product/Order Items - STACKED CARDS */
+        .order-items {
+            margin-bottom: clamp(20px, 5vw, 25px);
+        }
+
+        .order-item-card {
+            background: #f8f9fa;
+            border-radius: clamp(12px, 3vw, 15px);
+            padding: clamp(15px, 4vw, 20px);
+            margin-bottom: clamp(12px, 3vw, 15px);
+            border-left: 5px solid #ffd700;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: clamp(12px, 3vw, 15px);
+        }
+
+        .item-name {
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 700;
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .item-amount {
+            font-size: clamp(18px, 4.5vw, 22px);
+            font-weight: 800;
+            color: #1976d2;
+            white-space: nowrap;
+            margin-left: 10px;
+        }
+
+        .item-details-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(8px, 2vw, 10px);
+            margin-bottom: clamp(10px, 2.5vw, 12px);
+        }
+
+        .item-detail {
+            background: white;
+            padding: clamp(8px, 2vw, 10px);
+            border-radius: clamp(6px, 1.5vw, 8px);
+        }
+
+        .detail-label {
+            font-size: clamp(10px, 2.5vw, 11px);
+            color: #666;
+            margin-bottom: 3px;
+        }
+
+        .detail-value {
+            font-size: clamp(13px, 3.2vw, 15px);
+            font-weight: 700;
+            color: #333;
+        }
+
+        .item-status {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: clamp(8px, 2vw, 10px);
+            border-radius: clamp(6px, 1.5vw, 8px);
+            font-size: clamp(11px, 2.8vw, 13px);
+            font-weight: 600;
+            margin-top: clamp(8px, 2vw, 10px);
+        }
+
+        .item-status.warning {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .item-status.error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* Totals Section - HIGHLIGHTED */
+        .invoice-totals {
+            background: linear-gradient(135deg, #f8f9fa, #e8eaf0);
+            padding: clamp(20px, 5vw, 25px);
+            border-radius: clamp(12px, 3vw, 15px);
+            margin-bottom: clamp(15px, 4vw, 20px);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            padding: clamp(10px, 2.5vw, 12px) 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .total-row:last-child {
+            border-bottom: none;
+        }
+
+        .total-label {
+            font-size: clamp(13px, 3.2vw, 15px);
+            font-weight: 600;
+            color: #555;
+        }
+
+        .total-value {
+            font-size: clamp(13px, 3.2vw, 15px);
+            font-weight: 700;
+            color: #333;
+            text-align: right;
+        }
+
+        /* Grand Total - BIG HIGHLIGHT */
+        .grand-total-card {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            padding: clamp(18px, 4.5vw, 22px);
+            border-radius: clamp(12px, 3vw, 15px);
+            margin-top: clamp(15px, 4vw, 18px);
+            box-shadow: 0 6px 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .grand-total-card .total-label {
+            font-size: clamp(16px, 4vw, 20px);
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+
+        .grand-total-card .total-value {
+            font-size: clamp(24px, 6vw, 32px);
+            font-weight: 900;
+            color: #1a1a2e;
+        }
+
+        /* Due Balance - RED HIGHLIGHT */
+        .due-balance-card {
+            background: linear-gradient(135deg, #ff6b6b, #ff8787);
+            padding: clamp(18px, 4.5vw, 22px);
+            border-radius: clamp(12px, 3vw, 15px);
+            margin-top: clamp(12px, 3vw, 15px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .due-balance-card .total-label {
+            font-size: clamp(16px, 4vw, 20px);
+            font-weight: 800;
+            color: white;
+        }
+
+        .due-balance-card .total-value {
+            font-size: clamp(24px, 6vw, 32px);
+            font-weight: 900;
+            color: white;
+        }
+
+        .partial-payment-note {
+            text-align: center;
+            margin-top: clamp(10px, 2.5vw, 12px);
+            font-size: clamp(11px, 2.8vw, 13px);
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Payment Method */
+        .payment-method-card {
+            background: #e3f2fd;
+            padding: clamp(12px, 3vw, 15px);
+            border-radius: clamp(8px, 2vw, 10px);
+            margin-bottom: clamp(15px, 4vw, 20px);
+        }
+
+        .payment-method-card strong {
+            font-size: clamp(12px, 3vw, 14px);
+            color: #1976d2;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .payment-method-card span {
+            font-size: clamp(13px, 3.2vw, 15px);
+            color: #333;
+            font-weight: 600;
+        }
+
+        /* Invoice Footer */
+        .invoice-footer {
+            background: linear-gradient(135deg, #b0bec5, #cfd8dc);
+            padding: clamp(20px, 5vw, 25px);
+        }
+
+        .terms {
+            margin-bottom: clamp(15px, 4vw, 20px);
+        }
+
+        .terms h4 {
+            font-size: clamp(13px, 3.2vw, 15px);
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: clamp(8px, 2vw, 10px);
+        }
+
+        .terms p {
+            font-size: clamp(11px, 2.8vw, 13px);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .signature-area {
+            text-align: center;
+        }
+
+        .signature-line {
+            width: clamp(150px, 40vw, 200px);
+            height: clamp(50px, 12vw, 60px);
+            border-bottom: 2px solid #2c3e50;
+            margin: 0 auto clamp(8px, 2vw, 10px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            font-family: 'Brush Script MT', cursive;
+            font-size: clamp(20px, 5vw, 24px);
+            color: #2c3e50;
+        }
+
+        .logout-button {
+            display: block;
+            margin: clamp(18px, 4vw, 20px) auto 0;
+            padding: clamp(12px, 3vw, 14px) clamp(32px, 8vw, 40px);
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: clamp(10px, 2.5vw, 12px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            min-height: 48px;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background: #1565c0;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.08);
+            display: flex;
+            justify-content: space-around;
+            padding: 8px 0 max(6px, env(safe-area-inset-bottom));
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 3px;
+            text-decoration: none;
+            color: #999;
+            font-size: clamp(10px, 2.5vw, 11px);
+            padding: 4px 8px;
+            position: relative;
+            flex: 1;
+            max-width: 80px;
+            min-height: 48px;
+            justify-content: center;
+        }
+
+        .nav-item.active {
+            color: #1976d2;
+        }
+
+        .nav-item.active::before {
+            content: '';
+            position: absolute;
+            top: -8px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: clamp(30px, 8vw, 35px);
+            height: 3px;
+            background: #1976d2;
+            border-radius: 0 0 3px 3px;
+        }
+
+        .nav-icon {
+            font-size: clamp(20px, 5vw, 22px);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 15px 15px 90px 15px;
+            }
+
+            .choice-card,
+            .form-card {
+                padding: 35px 25px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .item-details-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 320px) {
+            body {
+                padding: 10px 10px 90px 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="lottery-drum">
+            <div class="drum-container">
+                <div class="drum-ring"></div>
+                <div class="drum-handle"></div>
+                <div class="balls-container">
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                </div>
+            </div>
+            <div class="drum-stand"></div>
+        </div>
+        <div class="loading-text">กำลังโหลด...</div>
+        <div class="loading-text-sub">Account</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        <div class="container">
+            
+            <!-- SCREEN 1: Choice (Login or Sign Up) -->
+            <div id="choiceScreen" class="screen active">
+                <div class="choice-card">
+                    <div class="account-logo">
+                        <img src="images/watermark.png" alt="GLO Logo">
+                    </div>
+                    <h1 class="account-title">My Account</h1>
+                    <button class="choice-button login" onclick="showLogin()">Login</button>
+                    <button class="choice-button signup" onclick="showSignup()">Sign Up</button>
+                </div>
+            </div>
+
+            <!-- SCREEN 2: Login Form -->
+            <div id="loginScreen" class="screen">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2 class="form-title">Login</h2>
+                        <p class="form-subtitle">Enter your credentials to access your account</p>
+                    </div>
+
+                    <div id="loginError" class="error-message"></div>
+
+                    <form id="loginForm" onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label class="form-label">Customer ID</label>
+                            <input type="text" class="form-input" id="loginCustomerId" placeholder="Enter Customer ID" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="loginPassword" placeholder="Enter Password" required>
+                        </div>
+
+                        <button type="submit" class="form-button">Login</button>
+                    </form>
+
+                    <div class="back-link">
+                        <a href="#" onclick="showChoice(); return false;">← Back to Account</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCREEN 3: Sign Up Form -->
+            <div id="signupScreen" class="screen">
+                <div class="form-card">
+                    <div class="form-header">
+                        <h2 class="form-title">Sign Up</h2>
+                        <p class="form-subtitle">Create a new account (pending admin approval)</p>
+                    </div>
+
+                    <div id="signupError" class="error-message"></div>
+
+                    <form id="signupForm" onsubmit="handleSignup(event)">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input type="text" class="form-input" id="signupName" placeholder="Enter Full Name" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" class="form-input" id="signupEmail" placeholder="Enter Email" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" id="signupPhone" placeholder="Enter Phone Number" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Password</label>
+                            <input type="password" class="form-input" id="signupPassword" placeholder="Create Password" required>
+                        </div>
+
+                        <button type="submit" class="form-button">Sign Up</button>
+                    </form>
+
+                    <div class="back-link">
+                        <a href="#" onclick="showChoice(); return false;">← Back to Account</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SCREEN 4: Invoice Display - NEW STACKED MOBILE DESIGN -->
+            <div id="invoiceScreen" class="screen">
+                <div class="invoice-container">
+                    
+                    <!-- Invoice Header -->
+                    <div class="invoice-header">
+                        <div class="invoice-logo-section">
+                            <div class="invoice-logo">
+                                <img src="images/watermark.png" alt="GLO Logo">
+                            </div>
+                            <div class="company-info">
+                                <h2>Government Lottery Office</h2>
+                                <p>Nonthaburi, Bangkok, Thailand<br>
+                                Agency: LUCY LIU - Pattaya city<br>
+                                +44 7441 343629<br>
+                                governmentl0tteryoffice@gmail.com<br>
+                                www.glo.or.th</p>
+                            </div>
+                        </div>
+                        <div class="registration-info">
+                            <h3>🎫 THAILAND LOTTERY REGISTRATION</h3>
+                            <p id="gameDate">16-12-2025</p>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Body -->
+                    <div class="invoice-body">
+                        
+                        <!-- Payment Status Badge - HIGHLIGHTED -->
+                        <div id="paymentStatusBadge" class="payment-status-badge">
+                            <h3>✅ PAID</h3>
+                            <p>Payment successfully completed</p>
+                        </div>
+
+                        <!-- Customer & Invoice Info Grid -->
+                        <div class="invoice-info-grid">
+                            <div class="info-card">
+                                <h4>📋 Bill To</h4>
+                                <p id="customerName"><strong>Customer Name</strong></p>
+                                <p id="customerLocation">Location</p>
+                                <p id="customerPhone">Phone</p>
+                                <p id="customerVat">VAT</p>
+                            </div>
+
+                            <div class="info-card">
+                                <h4>🧾 Invoice Details</h4>
+                                <div class="info-row">
+                                    <span class="info-label">Invoice #</span>
+                                    <span class="info-value" id="invoiceNumber">TH532458</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Date</span>
+                                    <span class="info-value" id="invoiceDate">05/11/2025</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">Due Date</span>
+                                    <span class="info-value" id="dueDate">14/12/2025</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">P.O. #</span>
+                                    <span class="info-value" id="poNumber">65247855</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Order Items - Stacked Cards -->
+                        <div class="order-items" id="orderItems">
+                            <div class="order-item-card">
+                                <div class="item-header">
+                                    <div class="item-name">🎰 Thailand Lottery 3UP</div>
+                                    <div class="item-amount">₹1,316,700</div>
+                                </div>
+                                
+                                <div class="item-details-grid">
+                                    <div class="item-detail">
+                                        <div class="detail-label">Quantity</div>
+                                        <div class="detail-value">1 3UP SET</div>
+                                    </div>
+                                    <div class="item-detail">
+                                        <div class="detail-label">Price</div>
+                                        <div class="detail-value">₹1,050,000</div>
+                                    </div>
+                                    <div class="item-detail">
+                                        <div class="detail-label">Discount</div>
+                                        <div class="detail-value">30%</div>
+                                    </div>
+                                    <div class="item-detail">
+                                        <div class="detail-label">Tax</div>
+                                        <div class="detail-value">14%</div>
+                                    </div>
+                                </div>
+
+                                <div class="item-status" id="paymentStatusText">
+                                    ✅ Payment of ₹2,53,000 successfully completed
+                                </div>
+                                
+                                <div class="item-status error" id="registrationStatusText">
+                                    ⚠️ REGISTRATION FAILED - Discount not applied
+                                </div>
+                            </div>
+
+                            <!-- Additional charges -->
+                            <div class="order-item-card">
+                                <div class="item-header">
+                                    <div class="item-name">💳 Cheque Bounce Charges</div>
+                                    <div class="item-amount">₹100,000</div>
+                                </div>
+                                
+                                <div class="item-details-grid">
+                                    <div class="item-detail">
+                                        <div class="detail-label">Quantity</div>
+                                        <div class="detail-value">1</div>
+                                    </div>
+                                    <div class="item-detail">
+                                        <div class="detail-label">Price</div>
+                                        <div class="detail-value">₹100,000</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Totals Section - HIGHLIGHTED -->
+                        <div class="invoice-totals">
+                            <div class="total-row">
+                                <span class="total-label">Subtotal</span>
+                                <span class="total-value">₹1,416,700.00</span>
+                            </div>
+                            <div class="total-row">
+                                <span class="total-label">Discount (21.7%)</span>
+                                <span class="total-value">-₹307,423.90</span>
+                            </div>
+                            <div class="total-row">
+                                <span class="total-label">Foreign Exchange Tax (28%)</span>
+                                <span class="total-value">₹310,597.30</span>
+                            </div>
+                        </div>
+
+                        <!-- Grand Total - BIG YELLOW CARD -->
+                        <div class="grand-total-card">
+                            <div class="total-row">
+                                <span class="total-label">💰 GRAND TOTAL</span>
+                                <span class="total-value" id="grandTotal">₹1,419,873.40</span>
+                            </div>
+                        </div>
+
+                        <!-- Due Balance - RED CARD (if applicable) -->
+                        <div id="dueBalanceCard" class="due-balance-card" style="display: none;">
+                            <div class="total-row">
+                                <span class="total-label">⚠️ DUE BALANCE</span>
+                                <span class="total-value" id="dueBalance">₹0.00</span>
+                            </div>
+                        </div>
+
+                        <div id="partialPaymentNote" class="partial-payment-note" style="display: none;">
+                            *Partially Paid: ₹0.00
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="payment-method-card">
+                            <strong>💳 Payment Method</strong>
+                            <span>Online</span>
+                        </div>
+                    </div>
+
+                    <!-- Invoice Footer -->
+                    <div class="invoice-footer">
+                        <div class="terms">
+                            <h4>📜 Terms & Conditions</h4>
+                            <p>• 100% Money back guarantee if not win<br>
+                            • 100% Direct 1 set game<br>
+                            • 100% Refund if not win</p>
+                        </div>
+                        <div class="signature-area">
+                            <div class="signature-line">Final</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="logout-button" onclick="logout()">🚪 Logout</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <a href="index.html" class="nav-item">
+            <div class="nav-icon">🏠</div>
+            <div>หน้าหลัก</div>
+        </a>
+        <a href="buy-ticket.html" class="nav-item">
+            <div class="nav-icon">🛒</div>
+            <div>Buy Ticket</div>
+        </a>
+        <a href="open-ticket.html" class="nav-item">
+            <div class="nav-icon">🔓</div>
+            <div>Open Ticket</div>
+        </a>
+        <a href="account.html" class="nav-item active">
+            <div class="nav-icon">👤</div>
+            <div>Account</div>
+        </a>
+        <a href="contact.html" class="nav-item">
+            <div class="nav-icon">📧</div>
+            <div>Contact</div>
+        </a>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrnJs19gMKZl4s8YXau_oz-07FWjbMcy8",
+            authDomain: "glo-lottery-app.firebaseapp.com",
+            databaseURL: "https://glo-lottery-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "glo-lottery-app",
+            storageBucket: "glo-lottery-app.firebasestorage.app",
+            messagingSenderId: "466299066608",
+            appId: "1:466299066608:web:fcfce72fac4787ac978a35"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Security Features
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U') ||
+                (e.ctrlKey && e.key === 'p')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'PrintScreen') {
+                navigator.clipboard.writeText('');
+            }
+        });
+
+        // Hide loader and show choice screen
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('main-content').classList.add('visible');
+                showChoice();
+            }, 2000);
+        });
+
+        // Screen Navigation
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function showChoice() {
+            showScreen('choiceScreen');
+        }
+
+        function showLogin() {
+            showScreen('loginScreen');
+        }
+
+        function showSignup() {
+            showScreen('signupScreen');
+        }
+
+        // Handle Login
+        function handleLogin(event) {
+            event.preventDefault();
+            const customerId = document.getElementById('loginCustomerId').value.trim();
+            const password = document.getElementById('loginPassword').value.trim();
+            const errorDiv = document.getElementById('loginError');
+
+            // Check in Firebase
+            database.ref('customers').orderByChild('customerId').equalTo(customerId).once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const customerData = Object.values(snapshot.val())[0];
+                        
+                        if (customerData.password === password) {
+                            if (customerData.approved) {
+                                // Login successful
+                                loadInvoice(customerData);
+                                showScreen('invoiceScreen');
+                            } else {
+                                errorDiv.textContent = 'Your account is pending admin approval.';
+                                errorDiv.classList.add('show');
+                            }
+                        } else {
+                            errorDiv.textContent = 'Incorrect password.';
+                            errorDiv.classList.add('show');
+                        }
+                    } else {
+                        errorDiv.textContent = 'Customer ID not found.';
+                        errorDiv.classList.add('show');
+                    }
+                })
+                .catch((error) => {
+                    errorDiv.textContent = 'Error: ' + error.message;
+                    errorDiv.classList.add('show');
+                });
+        }
+
+        // Handle Signup
+        function handleSignup(event) {
+            event.preventDefault();
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
+            const password = document.getElementById('signupPassword').value.trim();
+
+            // Generate Customer ID
+            const customerId = 'CUS' + Date.now();
+
+            // Save to Firebase
+            database.ref('customers').push({
+                customerId: customerId,
+                name: name,
+                email: email,
+                phone: phone,
+                password: password,
+                approved: false,
+                createdAt: new Date().toISOString()
+            })
+            .then(() => {
+                alert('Signup successful! Your Customer ID is: ' + customerId + '\n\nPlease wait for admin approval.');
+                showChoice();
+                document.getElementById('signupForm').reset();
+            })
+            .catch((error) => {
+                const errorDiv = document.getElementById('signupError');
+                errorDiv.textContent = 'Error: ' + error.message;
+                errorDiv.classList.add('show');
+            });
+        }
+
+        // Load Invoice
+        function loadInvoice(customerData) {
+            // Game Date
+            if (customerData.gameDate) {
+                document.getElementById('gameDate').textContent = customerData.gameDate;
+            }
+            
+            // Customer Info
+            document.getElementById('customerName').innerHTML = '<strong>' + customerData.name + '</strong>';
+            document.getElementById('customerLocation').textContent = customerData.location || '';
+            document.getElementById('customerPhone').textContent = customerData.phone || '';
+            if (customerData.vat) {
+                document.getElementById('customerVat').textContent = customerData.vat;
+            }
+            
+            // Invoice Meta
+            if (customerData.invoiceNumber) {
+                document.getElementById('invoiceNumber').textContent = customerData.invoiceNumber;
+            }
+            if (customerData.invoiceDate) {
+                document.getElementById('invoiceDate').textContent = customerData.invoiceDate;
+            }
+            if (customerData.dueDate) {
+                document.getElementById('dueDate').textContent = customerData.dueDate;
+            }
+            if (customerData.poNumber) {
+                document.getElementById('poNumber').textContent = customerData.poNumber;
+            }
+            
+            // Totals
+            if (customerData.grandTotal) {
+                document.getElementById('grandTotal').textContent = customerData.grandTotal;
+            }
+            
+            // Payment Status
+            const paymentStatus = customerData.paymentStatus || 'paid';
+            const badge = document.getElementById('paymentStatusBadge');
+            const dueBalanceCard = document.getElementById('dueBalanceCard');
+            const partialNote = document.getElementById('partialPaymentNote');
+            
+            if (paymentStatus === 'paid') {
+                badge.className = 'payment-status-badge';
+                badge.innerHTML = '<h3>✅ PAID</h3><p>Payment successfully completed</p>';
+                dueBalanceCard.style.display = 'none';
+                partialNote.style.display = 'none';
+            } else if (paymentStatus === 'partially-paid') {
+                badge.className = 'payment-status-badge partially-paid';
+                badge.innerHTML = '<h3>⚠️ PARTIALLY PAID</h3><p>Outstanding balance remaining</p>';
+                
+                const amountPaid = parseFloat(customerData.amountPaid || 0);
+                const grandTotalValue = parseFloat((customerData.grandTotal || '₹1,419,873.40').replace(/[₹,]/g, ''));
+                const dueBalanceValue = grandTotalValue - amountPaid;
+                
+                dueBalanceCard.style.display = 'block';
+                document.getElementById('dueBalance').textContent = '₹' + dueBalanceValue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                
+                partialNote.style.display = 'block';
+                partialNote.textContent = '*Partially Paid: ₹' + amountPaid.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            } else {
+                badge.className = 'payment-status-badge unpaid';
+                badge.innerHTML = '<h3>❌ UNPAID</h3><p>Payment pending</p>';
+                
+                const grandTotalValue = parseFloat((customerData.grandTotal || '₹1,419,873.40').replace(/[₹,]/g, ''));
+                dueBalanceCard.style.display = 'block';
+                document.getElementById('dueBalance').textContent = '₹' + grandTotalValue.toLocaleString('en-IN', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                partialNote.style.display = 'none';
+            }
+            
+            // Custom payment/registration status text
+            if (customerData.paymentStatusText) {
+                document.getElementById('paymentStatusText').innerHTML = customerData.paymentStatusText;
+            }
+            if (customerData.registrationStatusText) {
+                document.getElementById('registrationStatusText').innerHTML = customerData.registrationStatusText;
+            }
+        }
+
+        // Logout
+        function logout() {
+            showChoice();
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').classList.remove('show');
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,1544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Admin Panel - Official GLO</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1976d2">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        html {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%;
+        }
+
+        body {
+            font-family: 'Prompt', sans-serif;
+            background: linear-gradient(135deg, #0a1628 0%, #1a2744 50%, #0a1628 100%);
+            min-height: 100vh;
+            padding: clamp(15px, 4vw, 20px);
+            overflow-x: hidden;
+        }
+
+        /* Allow text selection in input fields and textareas */
+        input, textarea, select {
+            -webkit-user-select: text;
+            -moz-user-select: text;
+            -ms-user-select: text;
+            user-select: text;
+        }
+
+        /* ===== LOADER STYLES (FIXED CUTE PROPORTIONS) ===== */
+        #loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1e5bb8 0%, #0d8dd9 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+
+        #loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .lottery-drum {
+            position: relative;
+            width: 250px;
+            height: 250px;
+        }
+
+        .drum-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            animation: drumRotate 3s ease-in-out infinite;
+        }
+
+        .drum-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 16px solid #0d8dd9;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow:
+                inset 0 0 30px rgba(30, 91, 184, 0.2),
+                0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle {
+            position: absolute;
+            right: -50px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 65px;
+            height: 16px;
+            background: linear-gradient(90deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-handle::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 25px;
+            height: 25px;
+            background: #1e5bb8;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .drum-stand {
+            position: absolute;
+            bottom: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 165px;
+            height: 25px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 15px;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        .drum-stand::before,
+        .drum-stand::after {
+            content: '';
+            position: absolute;
+            top: -25px;
+            width: 16px;
+            height: 33px;
+            background: linear-gradient(180deg, #0d8dd9 0%, #1e5bb8 100%);
+            border-radius: 10px;
+        }
+
+        .drum-stand::before {
+            left: 25px;
+        }
+
+        .drum-stand::after {
+            right: 25px;
+        }
+
+        .balls-container {
+            position: absolute;
+            width: 183px;
+            height: 183px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: ballsRotate 2s linear infinite;
+        }
+
+        .lottery-ball {
+            position: absolute;
+            width: 33px;
+            height: 33px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8787 50%, #ffa5a5 100%);
+            border: 2.5px solid #c92a2a;
+            box-shadow:
+                inset -5px -5px 10px rgba(0, 0, 0, 0.2),
+                inset 5px 5px 10px rgba(255, 255, 255, 0.5),
+                0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: ballBounce 1s ease-in-out infinite;
+        }
+
+        .lottery-ball:nth-child(1) {
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0s;
+        }
+
+        .lottery-ball:nth-child(2) {
+            top: 25%;
+            right: 15%;
+            animation-delay: 0.2s;
+        }
+
+        .lottery-ball:nth-child(3) {
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            animation-delay: 0.4s;
+        }
+
+        .lottery-ball:nth-child(4) {
+            bottom: 25%;
+            right: 15%;
+            animation-delay: 0.6s;
+        }
+
+        .lottery-ball:nth-child(5) {
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            animation-delay: 0.8s;
+        }
+
+        .lottery-ball:nth-child(6) {
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 1s;
+        }
+
+        .lottery-ball:nth-child(7) {
+            top: 50%;
+            left: 5%;
+            transform: translateY(-50%);
+            animation-delay: 1.2s;
+        }
+
+        .lottery-ball:nth-child(8) {
+            top: 25%;
+            left: 15%;
+            animation-delay: 1.4s;
+        }
+
+        .lottery-ball:nth-child(9) {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: centerBallPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text {
+            margin-top: 60px;
+            color: white;
+            font-size: 20px;
+            font-weight: 600;
+            text-align: center;
+            animation: textPulse 1.5s ease-in-out infinite;
+        }
+
+        .loading-text-sub {
+            margin-top: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            text-align: center;
+        }
+
+        @keyframes drumRotate {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        @keyframes ballsRotate {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        @keyframes ballBounce {
+            0%, 100% { transform: scale(1) translateY(0); }
+            50% { transform: scale(1.1) translateY(-5px); }
+        }
+
+        @keyframes centerBallPulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.2); }
+        }
+
+        @keyframes textPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        @media (max-width: 360px) {
+            .lottery-drum {
+                width: 220px;
+                height: 220px;
+            }
+            
+            .drum-ring {
+                border-width: 14px;
+            }
+            
+            .drum-handle {
+                right: -45px;
+                width: 58px;
+                height: 14px;
+            }
+            
+            .drum-handle::after {
+                width: 22px;
+                height: 22px;
+            }
+            
+            .drum-stand {
+                bottom: -30px;
+                width: 145px;
+                height: 22px;
+            }
+            
+            .drum-stand::before,
+            .drum-stand::after {
+                top: -22px;
+                width: 14px;
+                height: 29px;
+            }
+            
+            .balls-container {
+                width: 161px;
+                height: 161px;
+            }
+            
+            .lottery-ball {
+                width: 29px;
+                height: 29px;
+                border-width: 2px;
+            }
+            
+            .loading-text {
+                font-size: 18px;
+                margin-top: 50px;
+            }
+            
+            .loading-text-sub {
+                font-size: 13px;
+            }
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        #main-content {
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+        }
+
+        /* Login Screen */
+        #loginScreen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        #loginScreen.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: clamp(20px, 5vw, 25px);
+            padding: clamp(40px, 10vw, 50px) clamp(30px, 8vw, 40px);
+            max-width: 450px;
+            width: 100%;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.2);
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: clamp(30px, 8vw, 40px);
+        }
+
+        .login-logo {
+            width: clamp(70px, 18vw, 80px);
+            height: clamp(70px, 18vw, 80px);
+            background: #ffd700;
+            border-radius: 50%;
+            margin: 0 auto clamp(15px, 4vw, 20px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: clamp(36px, 9vw, 40px);
+        }
+
+        .login-title {
+            color: #ffd700;
+            font-size: clamp(26px, 6.5vw, 32px);
+            font-weight: 700;
+            margin-bottom: clamp(8px, 2vw, 10px);
+        }
+
+        .login-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: clamp(14px, 3.5vw, 16px);
+        }
+
+        .form-group {
+            margin-bottom: clamp(20px, 5vw, 25px);
+        }
+
+        .form-label {
+            display: block;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: clamp(13px, 3.2vw, 14px);
+            font-weight: 600;
+            margin-bottom: clamp(6px, 1.5vw, 8px);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: clamp(12px, 3vw, 14px) clamp(14px, 3.5vw, 16px);
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            border-radius: clamp(10px, 2.5vw, 12px);
+            background: rgba(255, 255, 255, 0.9);
+            font-size: clamp(15px, 4vw, 16px);
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+        }
+
+        .login-button {
+            width: 100%;
+            padding: clamp(14px, 3.5vw, 16px);
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a2744;
+            border: none;
+            border-radius: clamp(12px, 3vw, 15px);
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            box-shadow: 0 5px 20px rgba(255, 215, 0, 0.4);
+            transition: all 0.3s ease;
+            min-height: 56px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+        }
+
+        .login-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .error-message {
+            background: rgba(255, 68, 68, 0.2);
+            border: 1px solid #ff4444;
+            color: #ff8888;
+            padding: clamp(10px, 2.5vw, 12px);
+            border-radius: clamp(8px, 2vw, 10px);
+            margin-bottom: clamp(18px, 4.5vw, 20px);
+            font-size: clamp(13px, 3.2vw, 14px);
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Dashboard */
+        #dashboard {
+            display: none;
+        }
+
+        #dashboard.visible {
+            display: block;
+        }
+
+        .dashboard-header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: clamp(16px, 4vw, 20px);
+            padding: clamp(20px, 5vw, 30px);
+            margin-bottom: clamp(20px, 5vw, 30px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: clamp(15px, 4vw, 20px);
+        }
+
+        .header-left h1 {
+            color: #ffd700;
+            font-size: clamp(24px, 6vw, 32px);
+            font-weight: 700;
+            margin-bottom: clamp(4px, 1vw, 5px);
+        }
+
+        .header-left p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: clamp(13px, 3.2vw, 16px);
+        }
+
+        .logout-btn {
+            padding: clamp(10px, 2.5vw, 12px) clamp(20px, 5vw, 30px);
+            background: rgba(255, 68, 68, 0.2);
+            border: 2px solid #ff4444;
+            color: #ff8888;
+            border-radius: clamp(10px, 2.5vw, 12px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.3s ease;
+            min-height: 48px;
+        }
+
+        .logout-btn:hover {
+            background: rgba(255, 68, 68, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: clamp(16px, 4vw, 20px);
+            padding: clamp(8px, 2vw, 10px);
+            margin-bottom: clamp(20px, 5vw, 30px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            display: flex;
+            gap: clamp(8px, 2vw, 10px);
+            overflow-x: auto;
+        }
+
+        .tab-button {
+            padding: clamp(10px, 2.5vw, 12px) clamp(18px, 4.5vw, 24px);
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: clamp(13px, 3.2vw, 15px);
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: clamp(10px, 2.5vw, 12px);
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-height: 48px;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a2744;
+        }
+
+        .tab-button:hover:not(.active) {
+            background: rgba(255, 215, 0, 0.1);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: clamp(16px, 4vw, 20px);
+            padding: clamp(20px, 5vw, 30px);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            margin-bottom: clamp(18px, 4.5vw, 20px);
+        }
+
+        .card-title {
+            color: #ffd700;
+            font-size: clamp(20px, 5vw, 24px);
+            font-weight: 700;
+            margin-bottom: clamp(18px, 4.5vw, 20px);
+        }
+
+        /* Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: clamp(18px, 4.5vw, 20px);
+            overflow-x: auto;
+            display: block;
+        }
+
+        .data-table thead {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
+        .data-table th {
+            padding: clamp(10px, 2.5vw, 12px);
+            text-align: left;
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 700;
+            color: #ffd700;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: clamp(10px, 2.5vw, 12px);
+            font-size: clamp(12px, 3vw, 14px);
+            color: rgba(255, 255, 255, 0.9);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        /* Buttons */
+        .btn {
+            padding: clamp(8px, 2vw, 10px) clamp(16px, 4vw, 20px);
+            border: none;
+            border-radius: clamp(6px, 1.5vw, 8px);
+            font-size: clamp(12px, 3vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+            transition: all 0.3s ease;
+            min-height: 40px;
+        }
+
+        .btn-approve {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+            color: #1a2744;
+            padding: clamp(12px, 3vw, 14px) clamp(24px, 6vw, 30px);
+            font-size: clamp(14px, 3.5vw, 16px);
+            min-height: 48px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .btn-delete {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-delete:hover {
+            background: #da190b;
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: clamp(15px, 4vw, 20px);
+            margin-bottom: clamp(20px, 5vw, 25px);
+        }
+
+        .form-grid-full {
+            grid-column: 1 / -1;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: clamp(50px, 12vw, 60px) clamp(18px, 4.5vw, 20px);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .empty-state-icon {
+            font-size: clamp(50px, 12vw, 60px);
+            margin-bottom: clamp(18px, 4.5vw, 20px);
+        }
+
+        .empty-state-text {
+            font-size: clamp(16px, 4vw, 18px);
+            font-weight: 600;
+        }
+
+        .success-message {
+            background: rgba(76, 175, 80, 0.2);
+            border: 1px solid #4CAF50;
+            color: #81C784;
+            padding: clamp(12px, 3vw, 15px);
+            border-radius: clamp(10px, 2.5vw, 12px);
+            margin-bottom: clamp(18px, 4.5vw, 20px);
+            font-size: clamp(13px, 3.2vw, 14px);
+            display: none;
+            line-height: 1.6;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        select.form-input {
+            cursor: pointer;
+        }
+
+        textarea.form-input {
+            min-height: clamp(90px, 22vw, 100px);
+            resize: vertical;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .dashboard-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .logout-btn {
+                width: 100%;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tabs-container {
+                flex-wrap: nowrap;
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+
+        @media (max-width: 320px) {
+            body {
+                padding: 10px;
+            }
+        }
+
+        .info-note {
+            background: rgba(33, 150, 243, 0.2);
+            border: 1px solid #2196F3;
+            color: #64B5F6;
+            padding: clamp(12px, 3vw, 15px);
+            border-radius: clamp(10px, 2.5vw, 12px);
+            margin-bottom: clamp(18px, 4.5vw, 20px);
+            font-size: clamp(13px, 3.2vw, 14px);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <!-- LOADER -->
+    <div id="loader">
+        <div class="lottery-drum">
+            <div class="drum-container">
+                <div class="drum-ring"></div>
+                <div class="drum-handle"></div>
+                <div class="balls-container">
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                    <div class="lottery-ball"></div>
+                </div>
+            </div>
+            <div class="drum-stand"></div>
+        </div>
+        <div class="loading-text">กำลังโหลด...</div>
+        <div class="loading-text-sub">Admin Panel</div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main-content">
+        
+        <!-- LOGIN SCREEN -->
+        <div id="loginScreen">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="login-logo">🔐</div>
+                    <h1 class="login-title">Admin Panel</h1>
+                    <p class="login-subtitle">Official GLO - Thailand Lottery</p>
+                </div>
+
+                <div class="info-note">
+                    🔒 <strong>Secure Login:</strong> This admin panel now uses Firebase Authentication for maximum security.
+                </div>
+
+                <div id="loginError" class="error-message"></div>
+
+                <form id="adminLoginForm" onsubmit="handleAdminLogin(event)">
+                    <div class="form-group">
+                        <label class="form-label">Admin Email</label>
+                        <input type="email" class="form-input" id="adminEmail" placeholder="admin@glo.com" value="admin@glo.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" class="form-input" id="adminPassword" placeholder="Enter password" required>
+                    </div>
+
+                    <button type="submit" class="login-button" id="loginBtn">🔓 Login to Admin Panel</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard">
+            <div class="dashboard-header">
+                <div class="header-left">
+                    <h1>🎫 GLO Admin Dashboard</h1>
+                    <p>Manage lottery system, customers, and results</p>
+                </div>
+                <button class="logout-btn" onclick="adminLogout()">🚪 Logout</button>
+            </div>
+
+            <!-- Tabs -->
+            <div class="tabs-container">
+                <button class="tab-button active" onclick="switchTab('signups')">📋 Pending Signups</button>
+                <button class="tab-button" onclick="switchTab('customers')">👥 Manage Customers</button>
+                <button class="tab-button" onclick="switchTab('invoices')">📄 Create Invoice</button>
+                <button class="tab-button" onclick="switchTab('results')">🎰 Lottery Results</button>
+                <button class="tab-button" onclick="switchTab('settings')">⚙️ Settings</button>
+            </div>
+
+            <!-- TAB 1: Pending Signups -->
+            <div id="tab-signups" class="tab-content active">
+                <div class="content-card">
+                    <h2 class="card-title">📋 Pending Signups (Waiting for Approval)</h2>
+                    <div id="signupsList"></div>
+                </div>
+            </div>
+
+            <!-- TAB 2: Manage Customers -->
+            <div id="tab-customers" class="tab-content">
+                <div class="content-card">
+                    <h2 class="card-title">👥 All Customers</h2>
+                    <div id="customersList"></div>
+                </div>
+                
+                <div class="content-card">
+                    <h2 class="card-title">➕ Add New Customer</h2>
+                    <div id="addCustomerSuccess" class="success-message"></div>
+                    <form id="addCustomerForm" onsubmit="addNewCustomer(event)">
+                        <div class="form-grid">
+                            <div>
+                                <label class="form-label">Customer ID</label>
+                                <input type="text" class="form-input" id="newCustomerId" placeholder="CUS021" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Password</label>
+                                <input type="text" class="form-input" id="newCustomerPassword" placeholder="pass021" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-input" id="newCustomerName" placeholder="FULL NAME IN CAPS" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-input" id="newCustomerEmail" placeholder="customer@example.com" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Phone</label>
+                                <input type="text" class="form-input" id="newCustomerPhone" placeholder="+974 1234 5678" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Location</label>
+                                <input type="text" class="form-input" id="newCustomerLocation" placeholder="Qatar" required>
+                            </div>
+                            <div>
+                                <label class="form-label">VAT Number</label>
+                                <input type="text" class="form-input" id="newCustomerVat" placeholder="VAT324448: 7CG54455">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">✅ Create Customer</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 3: Create Invoice -->
+            <div id="tab-invoices" class="tab-content">
+                <div class="content-card">
+                    <h2 class="card-title">📄 Create/Update Customer Invoice</h2>
+                    <div id="invoiceSuccess" class="success-message"></div>
+                    
+                    <form id="invoiceForm" onsubmit="saveInvoice(event)">
+                        <div class="form-group">
+                            <label class="form-label">Select Customer</label>
+                            <select class="form-input" id="invoiceCustomerSelect" onchange="loadCustomerInvoice()" required>
+                                <option value="">-- Select Customer --</option>
+                            </select>
+                        </div>
+
+                        <div class="form-grid">
+                            <div>
+                                <label class="form-label">Invoice Number</label>
+                                <input type="text" class="form-input" id="invoiceNumber" placeholder="TH532458" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Invoice Date</label>
+                                <input type="text" class="form-input" id="invoiceDate" placeholder="05/12/2025" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Due Date</label>
+                                <input type="text" class="form-input" id="dueDate" placeholder="14/12/2025" required>
+                            </div>
+                            <div>
+                                <label class="form-label">PO Number</label>
+                                <input type="text" class="form-input" id="poNumber" placeholder="65247855" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Game Date</label>
+                                <input type="text" class="form-input" id="gameDate" placeholder="16-12-2025" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Registration Date</label>
+                                <input type="text" class="form-input" id="registrationDate" placeholder="10-12-2025" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-grid-full">
+                                <label class="form-label">Product Description</label>
+                                <input type="text" class="form-input" id="productDescription" placeholder="Thailand Lottery 3UP" value="Thailand Lottery 3UP" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Subtotal (₹)</label>
+                                <input type="text" class="form-input" id="subtotal" placeholder="₹1,416,700.00" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Discount (₹)</label>
+                                <input type="text" class="form-input" id="discount" placeholder="-₹307,423.90" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Tax (₹)</label>
+                                <input type="text" class="form-input" id="tax" placeholder="₹310,597.30" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Grand Total (₹)</label>
+                                <input type="text" class="form-input" id="grandTotal" placeholder="₹1,419,873.40" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div>
+                                <label class="form-label">Payment Status</label>
+                                <select class="form-input" id="paymentStatus" required>
+                                    <option value="paid">Paid (Fully Paid)</option>
+                                    <option value="partially-paid">Partially Paid</option>
+                                    <option value="unpaid">Unpaid</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="form-label">Amount Paid (Number only)</label>
+                                <input type="number" step="0.01" class="form-input" id="amountPaid" placeholder="1419873.40" required>
+                            </div>
+                        </div>
+
+                        <div class="form-grid">
+                            <div class="form-grid-full">
+                                <label class="form-label">Payment Status Text (with emojis)</label>
+                                <textarea class="form-input" id="paymentStatusText" placeholder="👍👍 payment of Rs.2,53,000 has been successfully completed 👍👍" required></textarea>
+                            </div>
+                            <div class="form-grid-full">
+                                <label class="form-label">Registration Status Text (with emojis)</label>
+                                <textarea class="form-input" id="registrationStatusText" placeholder="✅✅ REGISTRATION SUCCESSFUL" required></textarea>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">💾 Save Invoice</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 4: Lottery Results -->
+            <div id="tab-results" class="tab-content">
+                <div class="content-card">
+                    <h2 class="card-title">🎰 Update Lottery Results</h2>
+                    <div id="resultsSuccess" class="success-message"></div>
+                    
+                    <form id="resultsForm" onsubmit="updateLotteryResults(event)">
+                        <div class="form-grid">
+                            <div>
+                                <label class="form-label">Draw Date (Thai format)</label>
+                                <input type="text" class="form-input" id="drawDate" placeholder="1 ธันวาคม 2568" required>
+                            </div>
+                            <div>
+                                <label class="form-label">First Prize (6 digits)</label>
+                                <input type="text" class="form-input" id="firstPrize" placeholder="461252" maxlength="6" required>
+                            </div>
+                            <div class="form-grid-full">
+                                <label class="form-label">3 Digit Front (comma-separated)</label>
+                                <input type="text" class="form-input" id="threeDigitFront" placeholder="389, 655" required>
+                            </div>
+                            <div class="form-grid-full">
+                                <label class="form-label">3 Digit Back (comma-separated)</label>
+                                <input type="text" class="form-input" id="threeDigitBack" placeholder="137, 995" required>
+                            </div>
+                            <div>
+                                <label class="form-label">2 Digit</label>
+                                <input type="text" class="form-input" id="twoDigit" placeholder="22" maxlength="2" required>
+                            </div>
+                        </div>
+
+                        <h3 style="margin: clamp(25px, 6vw, 30px) 0 clamp(12px, 3vw, 15px) 0; color: #ffd700; font-size: clamp(18px, 4.5vw, 20px);">🎪 N3 Lottery (New)</h3>
+                        
+                        <div class="form-grid">
+                            <div>
+                                <label class="form-label">N3 Main Number (3 digits)</label>
+                                <input type="text" class="form-input" id="n3MainNumber" placeholder="252" maxlength="3">
+                            </div>
+                            <div>
+                                <label class="form-label">N3 Tode Numbers (comma-separated)</label>
+                                <input type="text" class="form-input" id="n3TodeNumbers" placeholder="225, 522">
+                            </div>
+                            <div>
+                                <label class="form-label">N3 Two Digit</label>
+                                <input type="text" class="form-input" id="n3TwoDigit" placeholder="22" maxlength="2">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">🚀 Update Results (Live on Home Page)</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- TAB 5: Settings -->
+            <div id="tab-settings" class="tab-content">
+                <div class="content-card">
+                    <h2 class="card-title">⚙️ App Settings</h2>
+                    <div id="settingsSuccess" class="success-message"></div>
+                    
+                    <form id="settingsForm" onsubmit="updateSettings(event)">
+                        <div class="form-grid">
+                            <div>
+                                <label class="form-label">Open Ticket Password</label>
+                                <input type="text" class="form-input" id="ticketPassword" placeholder="ARSB3984" required>
+                            </div>
+                            <div>
+                                <label class="form-label">WhatsApp Number</label>
+                                <input type="text" class="form-input" id="whatsappNumber" placeholder="+44 7441 343629" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Contact Email</label>
+                                <input type="email" class="form-input" id="contactEmail" placeholder="governmentlotteryoffice@gmail.com" required>
+                            </div>
+                            <div>
+                                <label class="form-label">New Admin Password</label>
+                                <input type="password" class="form-input" id="newAdminPassword" placeholder="Leave blank to keep current">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">💾 Save Settings</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrnJs19gMKZl4s8YXau_oz-07FWjbMcy8",
+            authDomain: "glo-lottery-app.firebaseapp.com",
+            databaseURL: "https://glo-lottery-app-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "glo-lottery-app",
+            storageBucket: "glo-lottery-app.firebasestorage.app",
+            messagingSenderId: "466299066608",
+            appId: "1:466299066608:web:fcfce72fac4787ac978a35"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const auth = firebase.auth();
+
+        // Security Features
+        document.addEventListener('contextmenu', e => e.preventDefault());
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || 
+                (e.ctrlKey && e.shiftKey && e.key === 'I') ||
+                (e.ctrlKey && e.shiftKey && e.key === 'J') ||
+                (e.ctrlKey && e.key === 'U') ||
+                (e.ctrlKey && e.key === 'p')) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        
+        document.addEventListener('keyup', function(e) {
+            if (e.key === 'PrintScreen') {
+                navigator.clipboard.writeText('');
+            }
+        });
+
+        // Show loader, then check authentication state
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                document.getElementById('loader').classList.add('hidden');
+                document.getElementById('main-content').classList.add('visible');
+                
+                // Check if user is already logged in
+                auth.onAuthStateChanged((user) => {
+                    if (user) {
+                        // User is signed in
+                        showDashboard();
+                    }
+                });
+            }, 2000);
+        });
+
+        // Admin Login with Firebase Authentication
+        function handleAdminLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('adminEmail').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
+            const errorDiv = document.getElementById('loginError');
+            const loginBtn = document.getElementById('loginBtn');
+            
+            // Disable button
+            loginBtn.disabled = true;
+            loginBtn.textContent = '🔄 Logging in...';
+            errorDiv.classList.remove('show');
+
+            // Firebase Authentication
+            auth.signInWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Login successful
+                    showDashboard();
+                })
+                .catch((error) => {
+                    // Login failed
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = '🔓 Login to Admin Panel';
+                    
+                    let errorMessage = 'Login failed. Please check your credentials.';
+                    
+                    if (error.code === 'auth/user-not-found') {
+                        errorMessage = '❌ Admin account not found. Please contact support.';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = '❌ Incorrect password. Please try again.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = '❌ Invalid email format.';
+                    } else if (error.code === 'auth/too-many-requests') {
+                        errorMessage = '❌ Too many failed attempts. Please try again later.';
+                    }
+                    
+                    errorDiv.textContent = errorMessage;
+                    errorDiv.classList.add('show');
+                });
+        }
+
+        // Show Dashboard
+        function showDashboard() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('dashboard').classList.add('visible');
+            loadAllData();
+        }
+
+        // Admin Logout
+        function adminLogout() {
+            if (confirm('Are you sure you want to logout?')) {
+                auth.signOut().then(() => {
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                    document.getElementById('dashboard').classList.remove('visible');
+                    document.getElementById('adminLoginForm').reset();
+                    document.getElementById('loginError').classList.remove('show');
+                });
+            }
+        }
+
+        // Switch Tabs
+        function switchTab(tabName) {
+            // Remove active from all tabs and contents
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            // Add active to selected
+            event.target.classList.add('active');
+            document.getElementById('tab-' + tabName).classList.add('active');
+
+            // Reload data for the tab
+            if (tabName === 'signups') loadSignups();
+            if (tabName === 'customers') loadCustomers();
+            if (tabName === 'invoices') loadCustomersForInvoice();
+            if (tabName === 'settings') loadSettings();
+        }
+
+        // Load All Data
+        function loadAllData() {
+            loadSignups();
+            loadCustomers();
+            loadCustomersForInvoice();
+            loadSettings();
+        }
+
+        // TAB 1: Load Signups
+        function loadSignups() {
+            const container = document.getElementById('signupsList');
+            
+            database.ref('customers').orderByChild('approved').equalTo(false).once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">✅</div><div class="empty-state-text">No pending signups</div></div>';
+                    return;
+                }
+
+                let html = '<table class="data-table"><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Date</th><th>Action</th></tr></thead><tbody>';
+                
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    const key = child.key;
+                    html += `
+                        <tr>
+                            <td>${data.name || 'N/A'}</td>
+                            <td>${data.email || 'N/A'}</td>
+                            <td>${data.phone || 'N/A'}</td>
+                            <td>${new Date(data.createdAt).toLocaleDateString()}</td>
+                            <td><button class="btn btn-approve" onclick="approveSignup('${key}', '${data.customerId}')">✅ Approve</button></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            });
+        }
+
+        // Approve Signup
+        function approveSignup(key, customerId) {
+            if (confirm('Approve this customer? They will be able to login immediately.')) {
+                database.ref('customers/' + key).update({
+                    approved: true
+                }).then(() => {
+                    alert(`✅ Customer approved!\n\nCustomer ID: ${customerId}\n\nThey can now login to their account.`);
+                    loadSignups();
+                    loadCustomers();
+                });
+            }
+        }
+
+        // TAB 2: Load Customers
+        function loadCustomers() {
+            const container = document.getElementById('customersList');
+            
+            database.ref('customers').once('value').then((snapshot) => {
+                if (!snapshot.exists()) {
+                    container.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">No customers yet</div></div>';
+                    return;
+                }
+
+                let html = '<table class="data-table"><thead><tr><th>Customer ID</th><th>Password</th><th>Name</th><th>Location</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead><tbody>';
+                
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    const key = child.key;
+                    const status = data.approved ? '<span style="color: #4CAF50;">✅ Approved</span>' : '<span style="color: #ff8888;">⏳ Pending</span>';
+                    html += `
+                        <tr>
+                            <td><strong>${data.customerId || 'N/A'}</strong></td>
+                            <td><span style="font-family: monospace; color: #1976d2; font-weight: 600;">${data.password || 'N/A'}</span></td>
+                            <td>${data.name || 'N/A'}</td>
+                            <td>${data.location || 'N/A'}</td>
+                            <td>${data.phone || 'N/A'}</td>
+                            <td>${status}</td>
+                            <td><button class="btn btn-primary" style="font-size: 12px; padding: 6px 12px;" onclick="editCustomerAll('${key}')">✏️ Edit All</button></td>
+                        </tr>
+                    `;
+                });
+                
+                html += '</tbody></table>';
+                container.innerHTML = html;
+            });
+        }
+
+        // Add New Customer
+        function addNewCustomer(event) {
+            event.preventDefault();
+            
+            const customerData = {
+                customerId: document.getElementById('newCustomerId').value.trim(),
+                password: document.getElementById('newCustomerPassword').value.trim(),
+                name: document.getElementById('newCustomerName').value.trim().toUpperCase(),
+                email: document.getElementById('newCustomerEmail').value.trim(),
+                phone: document.getElementById('newCustomerPhone').value.trim(),
+                location: document.getElementById('newCustomerLocation').value.trim(),
+                vat: document.getElementById('newCustomerVat').value.trim(),
+                approved: true,
+                createdAt: new Date().toISOString(),
+                uid: auth.currentUser.uid // Admin UID
+            };
+
+            database.ref('customers').push(customerData).then(() => {
+                const successDiv = document.getElementById('addCustomerSuccess');
+                successDiv.textContent = `✅ Customer created successfully! Customer ID: ${customerData.customerId}`;
+                successDiv.classList.add('show');
+                
+                document.getElementById('addCustomerForm').reset();
+                loadCustomers();
+                
+                setTimeout(() => {
+                    successDiv.classList.remove('show');
+                }, 5000);
+            }).catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // Edit Customer - ALL DETAILS
+        function editCustomerAll(key) {
+            // First, get current data
+            database.ref('customers/' + key).once('value').then((snapshot) => {
+                const data = snapshot.val();
+                if (!data) {
+                    alert('Customer not found!');
+                    return;
+                }
+                
+                // Prompt for each field
+                const customerId = prompt('Customer ID:', data.customerId || '');
+                if (customerId === null) return; // User cancelled
+                
+                const password = prompt('Password:', data.password || '');
+                if (password === null) return;
+                
+                const name = prompt('Full Name:', data.name || '');
+                if (name === null) return;
+                
+                const email = prompt('Email:', data.email || '');
+                if (email === null) return;
+                
+                const phone = prompt('Phone:', data.phone || '');
+                if (phone === null) return;
+                
+                const location = prompt('Location/Country:', data.location || '');
+                if (location === null) return;
+                
+                const vat = prompt('VAT Number:', data.vat || '');
+                if (vat === null) return;
+                
+                // Validate required fields
+                if (!customerId.trim() || !password.trim() || !name.trim()) {
+                    alert('❌ Customer ID, Password, and Name are required!');
+                    return;
+                }
+                
+                // Update in Firebase
+                database.ref('customers/' + key).update({
+                    customerId: customerId.trim(),
+                    password: password.trim(),
+                    name: name.trim().toUpperCase(),
+                    email: email.trim(),
+                    phone: phone.trim(),
+                    location: location.trim(),
+                    vat: vat.trim(),
+                    updatedAt: new Date().toISOString()
+                }).then(() => {
+                    alert(`✅ Customer updated successfully!\n\n📋 LOGIN DETAILS TO SHARE:\n━━━━━━━━━━━━━━━━━━━━━\nCustomer ID: ${customerId.trim()}\nPassword: ${password.trim()}\n━━━━━━━━━━━━━━━━━━━━━\n\nShare these credentials with the customer so they can login!`);
+                    loadCustomers();
+                }).catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+            });
+        }
+
+        // TAB 3: Load Customers for Invoice Dropdown
+        function loadCustomersForInvoice() {
+            const select = document.getElementById('invoiceCustomerSelect');
+            
+            database.ref('customers').orderByChild('approved').equalTo(true).once('value').then((snapshot) => {
+                let options = '<option value="">-- Select Customer --</option>';
+                
+                snapshot.forEach((child) => {
+                    const data = child.val();
+                    const key = child.key;
+                    options += `<option value="${key}">${data.customerId} - ${data.name}</option>`;
+                });
+                
+                select.innerHTML = options;
+            });
+        }
+
+        // Load Customer Invoice Data
+        function loadCustomerInvoice() {
+            const select = document.getElementById('invoiceCustomerSelect');
+            const customerKey = select.value;
+            
+            if (!customerKey) return;
+
+            database.ref('customers/' + customerKey).once('value').then((snapshot) => {
+                const data = snapshot.val();
+                
+                // Pre-fill form with existing data
+                document.getElementById('invoiceNumber').value = data.invoiceNumber || '';
+                document.getElementById('invoiceDate').value = data.invoiceDate || '';
+                document.getElementById('dueDate').value = data.dueDate || '';
+                document.getElementById('poNumber').value = data.poNumber || '';
+                document.getElementById('gameDate').value = data.gameDate || '';
+                document.getElementById('registrationDate').value = data.registrationDate || '';
+                document.getElementById('productDescription').value = data.productDescription || 'Thailand Lottery 3UP';
+                document.getElementById('subtotal').value = data.subtotal || '';
+                document.getElementById('discount').value = data.discount || '';
+                document.getElementById('tax').value = data.tax || '';
+                document.getElementById('grandTotal').value = data.grandTotal || '';
+                document.getElementById('paymentStatus').value = data.paymentStatus || 'paid';
+                document.getElementById('amountPaid').value = data.amountPaid || 0;
+                document.getElementById('paymentStatusText').value = data.paymentStatusText || '';
+                document.getElementById('registrationStatusText').value = data.registrationStatusText || '';
+            });
+        }
+
+        // Save Invoice
+        function saveInvoice(event) {
+            event.preventDefault();
+            
+            const customerKey = document.getElementById('invoiceCustomerSelect').value;
+            
+            if (!customerKey) {
+                alert('Please select a customer first');
+                return;
+            }
+
+            const invoiceData = {
+                invoiceNumber: document.getElementById('invoiceNumber').value.trim(),
+                invoiceDate: document.getElementById('invoiceDate').value.trim(),
+                dueDate: document.getElementById('dueDate').value.trim(),
+                poNumber: document.getElementById('poNumber').value.trim(),
+                gameDate: document.getElementById('gameDate').value.trim(),
+                registrationDate: document.getElementById('registrationDate').value.trim(),
+                productDescription: document.getElementById('productDescription').value.trim(),
+                subtotal: document.getElementById('subtotal').value.trim(),
+                discount: document.getElementById('discount').value.trim(),
+                tax: document.getElementById('tax').value.trim(),
+                grandTotal: document.getElementById('grandTotal').value.trim(),
+                paymentStatus: document.getElementById('paymentStatus').value,
+                amountPaid: parseFloat(document.getElementById('amountPaid').value),
+                paymentStatusText: document.getElementById('paymentStatusText').value.trim(),
+                registrationStatusText: document.getElementById('registrationStatusText').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
+
+            database.ref('customers/' + customerKey).update(invoiceData).then(() => {
+                const successDiv = document.getElementById('invoiceSuccess');
+                successDiv.textContent = '✅ Invoice saved successfully! Customer can now see it in their account.';
+                successDiv.classList.add('show');
+                
+                setTimeout(() => {
+                    successDiv.classList.remove('show');
+                }, 5000);
+            }).catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // TAB 4: Update Lottery Results
+        function updateLotteryResults(event) {
+            event.preventDefault();
+            
+            const resultsData = {
+                date: document.getElementById('drawDate').value.trim(),
+                firstPrize: document.getElementById('firstPrize').value.trim(),
+                threeDigitFront: document.getElementById('threeDigitFront').value.trim(),
+                threeDigitBack: document.getElementById('threeDigitBack').value.trim(),
+                twoDigit: document.getElementById('twoDigit').value.trim(),
+                n3MainNumber: document.getElementById('n3MainNumber').value.trim() || '',
+                n3TodeNumbers: document.getElementById('n3TodeNumbers').value.trim() || '',
+                n3TwoDigit: document.getElementById('n3TwoDigit').value.trim() || '',
+                updatedAt: new Date().toISOString()
+            };
+
+            database.ref('lotteryResults').set(resultsData).then(() => {
+                const successDiv = document.getElementById('resultsSuccess');
+                successDiv.textContent = '✅ Lottery results updated! They are now live on the home page.';
+                successDiv.classList.add('show');
+                
+                setTimeout(() => {
+                    successDiv.classList.remove('show');
+                }, 5000);
+            }).catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+
+        // TAB 5: Load Settings
+        function loadSettings() {
+            database.ref('settings').once('value').then((snapshot) => {
+                const data = snapshot.val() || {};
+                document.getElementById('ticketPassword').value = data.ticketPassword || 'ARSB3984';
+                document.getElementById('whatsappNumber').value = data.whatsappNumber || '+44 7441 343629';
+                document.getElementById('contactEmail').value = data.contactEmail || 'governmentlotteryoffice@gmail.com';
+            });
+        }
+
+        // Update Settings
+        function updateSettings(event) {
+            event.preventDefault();
+            
+            const settingsData = {
+                ticketPassword: document.getElementById('ticketPassword').value.trim(),
+                whatsappNumber: document.getElementById('whatsappNumber').value.trim(),
+                contactEmail: document.getElementById('contactEmail').value.trim(),
+                updatedAt: new Date().toISOString()
+            };
+
+            const newPassword = document.getElementById('newAdminPassword').value.trim();
+
+            // Update settings first
+            database.ref('settings').set(settingsData).then(() => {
+                // Update admin password if provided
+                if (newPassword) {
+                    return auth.currentUser.updatePassword(newPassword);
+                }
+                return Promise.resolve();
+            }).then(() => {
+                const successDiv = document.getElementById('settingsSuccess');
+                if (newPassword) {
+                    successDiv.innerHTML = `
+                        ✅ Settings updated successfully!<br><br>
+                        <strong>🔐 NEW ADMIN PASSWORD SET!</strong><br>
+                        Your password has been changed. You'll need to use the new password next time you login.
+                    `;
+                } else {
+                    successDiv.textContent = '✅ Settings updated successfully!';
+                }
+                successDiv.classList.add('show');
+                
+                document.getElementById('newAdminPassword').value = '';
+                
+                setTimeout(() => {
+                    successDiv.classList.remove('show');
+                }, 10000);
+            }).catch((error) => {
+                alert('Error: ' + error.message);
+            });
+        }
+    </script>
+</body>
+</html>
